@@ -987,7 +987,10 @@ let lastStat = null;   // oxirgi hisoblangan kvadratik/nazariy xatolik (Excel uc
 /* ════════════════════════════════════════════════
    TOUCH DETECTION (mobil raqamli klaviatura uchun)
    ════════════════════════════════════════════════ */
-const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints||0) > 0;
+// Faqat asosiy kiritiş qurilmasi barmoq bölsa (telefon/planşet). Teginişli ekranli noutbuk/kompyuterda sichqoncha asosiy — klaviatura çiqmaydi.
+const isTouchDevice = (typeof window.matchMedia==='function')
+  ? window.matchMedia('(pointer: coarse)').matches
+  : (('ontouchstart' in window) && !/Windows NT|Macintosh|X11|Linux x86/i.test(navigator.userAgent));
 
 /* ════════════════════════════════════════════════
    SAFE EXPRESSION PARSER (recursive descent)
