@@ -357,6 +357,14 @@ table.lab thead th .hunit input.hunit-in:not(:placeholder-shown){border-style:so
 .video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
 .msg.warn{background:var(--amber-bg);color:#92400e}
 
+/* ══ GRAFIK ICHIDA TAHRIRLASH ═══════════════════ */
+.chart-stage{position:relative;width:100%;max-width:100%;line-height:0}
+.chart-stage #fitCanvas{display:block;width:100%}
+.chart-hover{position:absolute;display:none;pointer-events:none;border:1.5px dashed #3b82f6;background:rgba(59,130,246,.07);border-radius:6px;z-index:3}
+.chart-title-hint{position:absolute;top:8px;left:50%;transform:translateX(-50%);display:none;line-height:1.2;font-size:12px;font-weight:700;font-family:inherit;color:var(--sub);background:rgba(255,255,255,.9);border:1.5px dashed #94a3b8;border-radius:99px;padding:5px 14px;cursor:text;z-index:2}
+.chart-title-hint:hover{color:var(--accent);border-color:var(--accent)}
+.chart-editor{position:absolute;z-index:6;box-sizing:border-box;line-height:normal;font-family:'Segoe UI',system-ui,sans-serif;color:#0f172a;background:#fff;border:2px solid var(--accent);border-radius:6px;padding:2px 8px;outline:none;box-shadow:0 6px 18px rgba(15,23,42,.22)}
+
 /* ══ RESPONSIVE ══════════════════════════════════ */
 @media(max-width:900px){
   .layout{flex-direction:column}
@@ -509,10 +517,6 @@ table.lab thead th .hunit input.hunit-in:not(:placeholder-shown){border-style:so
       <section class="card">
         <h2>📈 <span data-i="chartTitle">Boğlaniş grafigi va eng mos çiziq (best fit)</span></h2>
         <div class="desc" data-i="chartDesc">Ikki ustun orasidagi boğlaniş nuqtalarini çizing va mos keladigan approksimatsiya turini tanlang — dastur töğri çiziqni majburan çizmaydi.</div>
-        <label class="f"><span data-i="chartTitleInputLabel">Grafik sarlavhasi (title) — ixtiyoriy</span>
-          <input type="text" id="chartTitleInput" data-i-ph="chartTitleInputPh" placeholder="masalan: Tezlikning vaqtga boğliqligi" autocomplete="off">
-        </label>
-        <div class="greek-bar" data-greek-bar="chartTitleInput"></div>
         <div class="opt-row" id="bestFitRow">
           <span class="opt-label" data-i="bestFitLabel">Best Fit</span>
           <label class="sw"><input type="checkbox" id="swBestFit" checked><span class="sw-state"></span><span class="sw-track"><span class="sw-knob"></span></span></label>
@@ -520,6 +524,10 @@ table.lab thead th .hunit input.hunit-in:not(:placeholder-shown){border-style:so
         <div class="opt-row" id="smoothRow">
           <span class="opt-label" data-i="smoothLabel">Nuqtalarni silliq çiziq bilan tutaştiriş</span>
           <label class="sw"><input type="checkbox" id="swSmooth"><span class="sw-state"></span><span class="sw-track"><span class="sw-knob"></span></span></label>
+        </div>
+        <div class="opt-row" id="legendRow">
+          <span class="opt-label" data-i="legShowLabel">Legendni körsatiş</span>
+          <label class="sw"><input type="checkbox" id="swLegend" checked><span class="sw-state"></span><span class="sw-track"><span class="sw-knob"></span></span></label>
         </div>
         <div class="row3">
           <label class="f"><span data-i="xColLabel">X öqi (ustun)</span><select id="xCol"></select></label>
@@ -546,40 +554,16 @@ table.lab thead th .hunit input.hunit-in:not(:placeholder-shown){border-style:so
             X örnida har doim <b>x</b> işlatiladi. Boşqa har qanday harf (a, b, c, k, m...) — dastur avtomatik topadigan noma'lum parametr hisoblanadi. Ruxsat etilgan amallar va funksiyalar formuladagi kabi: <b>+ − * / ^ ()</b>, <b>sin cos tan sqrt abs ln log10 exp</b>. Özgarmaslar (π, e va h.k.) faqat «Özgarmas kattaliklar» bandida özingiz kiritgandagina işlaydi; e^x uçun <b>exp(x)</b> dan foydalaning.
           </div>
         </div>
-        <div class="row2">
-          <label class="f"><span data-i="xUnitLabel">X öqi birligi</span><input type="text" id="xUnit" data-i-ph="unitEgPh" placeholder="masalan: s" autocomplete="off"></label>
-          <label class="f"><span data-i="yUnitLabel">Y öqi birligi</span><input type="text" id="yUnit" data-i-ph="unitEgPh" placeholder="masalan: V" autocomplete="off"></label>
-        </div>
-        <div class="greek-bar" data-greek-bar="xUnit"></div>
-        <details class="legend-set" id="legendSet">
-          <summary data-i="legendSetTitle">Legend sozlamalari</summary>
-          <div class="opt-row">
-            <span class="opt-label" data-i="legShowLabel">Legendni körsatiş</span>
-            <label class="sw"><input type="checkbox" id="swLegend" checked><span class="sw-state"></span><span class="sw-track"><span class="sw-knob"></span></span></label>
-          </div>
-          <label class="f"><span data-i="legDataLabel">Nuqtalar yozuvi</span><input type="text" id="legData" autocomplete="off"></label>
-          <label class="f"><span data-i="legFitLabel">Best fit çiziği yozuvi</span><input type="text" id="legFit" autocomplete="off"></label>
-          <label class="f"><span data-i="legSmoothLabel">Tutaştiruvçi çiziq yozuvi</span><input type="text" id="legSmooth" autocomplete="off"></label>
-          <div class="row2">
-            <label class="f"><span data-i="legPosLabel">Legend joyi</span>
-              <select id="legPos">
-                <option value="auto" data-i="legPosAuto">Avtomatik (yuqori çap)</option>
-                <option value="tl" data-i="legPosTL">Yuqori çap</option>
-                <option value="tr" data-i="legPosTR">Yuqori öng</option>
-                <option value="bl" data-i="legPosBL">Pastki çap</option>
-                <option value="br" data-i="legPosBR">Pastki öng</option>
-                <option value="custom" data-i="legPosCustom" hidden>Qölda (sudralgan)</option>
-              </select>
-            </label>
-            <div style="flex:0 0 auto;align-self:flex-end;margin-bottom:12px"><button type="button" class="btn btn-ghost btn-sm" id="btnLegReset" data-i="legReset">Standartga qaytariş</button></div>
-          </div>
-          <div class="varhint" data-i="legDragHint" style="margin-top:0">Legendni grafik ustida siçqonça (yoki barmoq) bilan sudrab istalgan joyga qöyişingiz mumkin.</div>
-        </details>
         <button class="btn btn-primary" id="btnPlot">📈 <span data-i="plotBtn">Grafik çiziş</span></button>
         <div id="chartMsg" class="msg"></div>
         <div class="chart-wrap" style="margin-top:14px">
-          <canvas id="fitCanvas" width="640" height="420"></canvas>
+          <div class="chart-stage" id="chartStage">
+            <canvas id="fitCanvas" width="640" height="420"></canvas>
+            <div class="chart-hover" id="chartHover"></div>
+            <button type="button" class="chart-title-hint" id="chartTitleHint">✎ <span data-i="chartTitleAdd">Sarlavha qöşiş</span></button>
+          </div>
         </div>
+        <div class="varhint" id="chartEditHint" data-i="chartEditHint" style="margin-top:8px;text-align:center"></div>
         <div class="fit-eq" id="fitEq" style="display:none"></div>
         <div class="fit-stats" id="fitStats"></div>
         <button class="btn btn-outline" id="btnSaveImg" style="margin-top:12px;display:none">🖼 <span data-i="saveImgBtn">Grafikni rasm sifatida saqlaş</span></button>
@@ -897,6 +881,24 @@ const I18N_EXTRA2 = {
   }
 };
 Object.keys(I18N_EXTRA2).forEach(k=>Object.assign(I18N[k], I18N_EXTRA2[k]));
+const I18N_EXTRA3 = {
+  uz:{
+    chartTitleAdd:"Sarlavha qöşiş",
+    chartEditHint:"Grafikdagi yozuvlarni bosib özgartiring: sarlavha, X/Y öqi nomlari (birligi bilan) va legend matni. Legendni ushlab sudrab istalgan joyga qöying. Yozuvda: ^ daraja (m^2), _ indeks (T_1), a/b kasr, \\mu kabi yunon harflari. Böş qoldirsangiz standart yozuv qaytadi.",
+    chartTipEdit:"Bosib özgartiring", chartTipLegend:"Ushlab sudrang · matnni bosib özgartiring"
+  },
+  ru:{
+    chartTitleAdd:"Добавить заголовок",
+    chartEditHint:"Нажимайте на надписи на графике, чтобы изменить их: заголовок, названия осей X/Y (с единицами) и текст легенды. Легенду можно перетащить в любое место. В тексте: ^ степень (m^2), _ индекс (T_1), a/b дробь, \\mu и другие греческие буквы. Пустое поле возвращает стандартную надпись.",
+    chartTipEdit:"Нажмите, чтобы изменить", chartTipLegend:"Перетащите · нажмите на текст, чтобы изменить"
+  },
+  en:{
+    chartTitleAdd:"Add title",
+    chartEditHint:"Click any text on the chart to edit it: the title, the X/Y axis names (with units) and the legend text. Drag the legend anywhere. In text: ^ power (m^2), _ subscript (T_1), a/b fraction, \\mu and other Greek letters. Leave it empty to restore the default.",
+    chartTipEdit:"Click to edit", chartTipLegend:"Drag to move · click the text to edit"
+  }
+};
+Object.keys(I18N_EXTRA3).forEach(k=>Object.assign(I18N[k], I18N_EXTRA3[k]));
 
 /* ════════════════════════════════════════════════
    FORMULA HELP PANEL — TILGA QARAB (uz/ru/en)
@@ -2310,12 +2312,13 @@ document.getElementById('btnPlot').addEventListener('click',()=>{
     try{ fit=computeFit(xs, ys, fitType, customFormula); }catch(e){ fitErr=e; }
   }
   setChartMsg(fitErr ? (t('fitFailedNote')+' '+fitErr.message) : '', 'err');
+  if(lastFit && lastFit.xid!==xid) chartUI.xOv=null;
+  if(lastFit && lastFit.yid!==yid) chartUI.yOv=null;
   lastFit={xs,ys,fit,fitType,customFormula,fitFailed:!!fitErr,xid,yid,xLabel:axisLabel(cols.find(c=>c.id===xid)),yLabel:axisLabel(cols.find(c=>c.id===yid))};
   refreshChartUI();
   document.getElementById('btnSaveImg').style.display='inline-flex';
 });
 document.getElementById('swBestFit').addEventListener('change', ()=>{ if(lastFit) lastFit.fitFailed=false; updateFitControlsVisibility(); refreshChartUI(); });
-document.getElementById('chartTitleInput').addEventListener('input', ()=>{ if(lastFit) drawChart(); });
 
 function roundRectPath(ctx,x,y,w,h,r){
   ctx.beginPath();
@@ -2337,8 +2340,7 @@ function drawChart(){
   const xLabel=cxo?axisLabel(cxo):lastFit.xLabel, yLabel=cyo?axisLabel(cyo):lastFit.yLabel;
   refreshLegendPlaceholders(fit);
   const showFit = !!fit && document.getElementById('swBestFit').checked;
-  const titleEl=document.getElementById('chartTitleInput');
-  const title=latexToGreek((titleEl ? titleEl.value : '').trim());
+  const title=latexToGreek((chartUI.title||'').trim());
   const cv=document.getElementById('fitCanvas');
   // Rasm/eksport tiniq chiqishi uchun canvas'ning haqiqiy piksel zichligini
   // oshiramiz (kamida 3x), lekin barcha chizish kodini o'zgartirmasdan
@@ -2354,16 +2356,14 @@ function drawChart(){
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
 
-  // ── SARLAVHA (rasm tarkibida) ──
+  // ── SARLAVHA (rasm tarkibida; ustiga bosib o'zgartiriladi) ──
+  chartUI.regions={}; chartUI.legRows=[];
+  updateChartOverlays(!!title);
   if(title){
-    let fs=17, txt=title; const maxW=W-40;
-    ctx.font='bold '+fs+'px Segoe UI';
-    while(ctx.measureText(txt).width>maxW && fs>11){ fs-=0.5; ctx.font='bold '+fs+'px Segoe UI'; }
-    while(ctx.measureText(txt).width>maxW && txt.length>4){ txt=txt.slice(0,-2); }
-    if(txt!==title) txt=txt.replace(/\s+$/,'')+'…';
-    ctx.fillStyle='#0f172a'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(txt, W/2, 30);
-    ctx.textBaseline='alphabetic';
+    const TL=layoutRichRoot(ctx, rtParse(title,'none'), 17, W-40, 11, true);
+    ctx.fillStyle='#0f172a'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    TL.draw(W/2-TL.w/2, 36);
+    { const rw=Math.max(TL.w+12,140); chartUI.regions.title={x:W/2-rw/2, y:36-TL.a-4, w:rw, h:TL.a+TL.d+8}; }
   }
 
   const xmin=Math.min(...xs), xmax=Math.max(...xs);
@@ -2409,15 +2409,20 @@ function drawChart(){
 
   // ── O'Q NOMLARI (rasm tarkibida) ──
   ctx.fillStyle='#0f172a'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  const xNm = cxo ? latexToGreek(cxo.header) : latexToGreek(String(lastFit.xLabel||''));
-  const xUn = cxo ? latexToGreek(colUnit(cxo).trim()) : '';
-  const yNm = cyo ? latexToGreek(cyo.header) : latexToGreek(String(lastFit.yLabel||''));
-  const yUn = cyo ? latexToGreek(colUnit(cyo).trim()) : '';
-  const XL = layoutAxisLabel(ctx, xNm, xUn, W-padL-padR);
-  XL.draw((padL+W-padR)/2 - XL.w/2, Math.min(H-12, H-4-XL.d));
-  const YL = layoutAxisLabel(ctx, yNm, yUn, H-pad-padT);
-  ctx.save(); ctx.translate(Math.max(17, 4+YL.a), (padT+H-pad)/2); ctx.rotate(-Math.PI/2);
+  const axisRoot=(c, fallback, ov)=>{
+    if(ov!==null && ov!==undefined) return buildAxisRoot(latexToGreek(ov));
+    if(c) return buildAxisRootNU(latexToGreek(c.header), latexToGreek(colUnit(c).trim()));
+    return buildAxisRoot(latexToGreek(String(fallback||'')));
+  };
+  const XL = layoutRichRoot(ctx, axisRoot(cxo, lastFit.xLabel, chartUI.xOv), 13, W-padL-padR, 8, true);
+  const xBase = Math.min(H-12, H-4-XL.d), xLeft = (padL+W-padR)/2 - XL.w/2;
+  XL.draw(xLeft, xBase);
+  { const rw=Math.max(XL.w+12,110); chartUI.regions.x={x:(padL+W-padR)/2-rw/2, y:xBase-Math.max(XL.a,12)-4, w:rw, h:Math.max(XL.a,12)+Math.max(XL.d,6)+8}; }
+  const YL = layoutRichRoot(ctx, axisRoot(cyo, lastFit.yLabel, chartUI.yOv), 13, H-pad-padT, 8, true);
+  const yBaseX = Math.max(17, 4+YL.a), yCy = (padT+H-pad)/2;
+  ctx.save(); ctx.translate(yBaseX, yCy); ctx.rotate(-Math.PI/2);
   YL.draw(-YL.w/2, 0); ctx.restore();
+  { const rh=Math.max(YL.w+12,110); chartUI.regions.y={x:yBaseX-Math.max(YL.a,12)-4, y:yCy-rh/2, w:Math.max(YL.a,12)+Math.max(YL.d,6)+8, h:rh}; }
 
   const showSmooth = !!(document.getElementById('swSmooth') && document.getElementById('swSmooth').checked);
   ctx.save(); ctx.beginPath(); ctx.rect(padL, padT, W-padL-padR, H-pad-padT); ctx.clip();   // egri chiziq grafikdan tashqariga chiqmasin
@@ -2465,10 +2470,11 @@ function drawChart(){
   const legSw=document.getElementById('swLegend');
   const legOn = legSw ? legSw.checked : true;
   if(legOn && (showFit || showSmooth)){
-    const lv=id=>latexToGreek((document.getElementById(id).value||'').trim());
-    const legendItems=[{kind:'point', color:'#dc2626', label:lv('legData')||t('legendData')}];
-    if(showFit) legendItems.push({kind:'line', color:'#1d4ed8', label:lv('legFit')||fit.equation});
-    if(showSmooth) legendItems.push({kind:'line', color:'#0d9488', label:lv('legSmooth')||t('legendSmooth')});
+    const lv=k=>latexToGreek((chartUI[k]||'').trim());
+    chartUI.legDefaults={legData:t('legendData'), legFit:(fit?fit.equation:''), legSmooth:t('legendSmooth')};
+    const legendItems=[{key:'legData', kind:'point', color:'#dc2626', label:lv('legData')||t('legendData')}];
+    if(showFit) legendItems.push({key:'legFit', kind:'line', color:'#1d4ed8', label:lv('legFit')||fit.equation});
+    if(showSmooth) legendItems.push({key:'legSmooth', kind:'line', color:'#0d9488', label:lv('legSmooth')||t('legendSmooth')});
     const maxLegendW=W-padL-padR-24;
     let legendFont=12.5;
     ctx.font=legendFont+'px Segoe UI';
@@ -2501,6 +2507,7 @@ function drawChart(){
     ctx.fill(); ctx.stroke();
     legendItems.forEach((item,i)=>{
       const rowY=boxY+padY+rowH*i+rowGap*i+rowH/2;
+      chartUI.legRows.push({key:item.key, x:boxX, y:rowY-rowH/2, w:boxW, h:rowH});
       if(item.kind==='point'){
         ctx.fillStyle=item.color;
         ctx.beginPath(); ctx.arc(boxX+padX+markerW/2, rowY, 4.5, 0, Math.PI*2); ctx.fill();
@@ -2815,12 +2822,7 @@ function syncUnitInputs(){
     if(c && document.activeElement!==inp && inp.value!==(c.unit||'')) inp.value=c.unit||'';
   });
 }
-function refreshLegendPlaceholders(fit){
-  const a=document.getElementById('legData'), b=document.getElementById('legFit'), s=document.getElementById('legSmooth');
-  if(a) a.placeholder=t('legendData');
-  if(b) b.placeholder=fit ? fit.equation : t('bestFitLabel');
-  if(s) s.placeholder=t('legendSmooth');
-}
+function refreshLegendPlaceholders(fit){ /* endi legend yozuvlari grafikning özida tahrirlanadi */ }
 
 // Nuqtalarni "chiroyli" tutashtirish: monoton kubik (PCHIP) interpolyatsiya — nuqtalar orasida ortiqcha tebranish bo'lmaydi
 function smoothCurve(xs, ys){
@@ -2867,78 +2869,11 @@ const legendState={pos:null, preset:'auto'};
 let legendRect=null;
 
 function initChartExtras(){
-  // birliklar (X/Y o'qi)
-  ['x','y'].forEach(ax=>{
-    const inp=document.getElementById(ax+'Unit'), sel=document.getElementById(ax+'Col');
-    inp.addEventListener('input',()=>{
-      const c=cols.find(x=>x.id===sel.value);
-      if(!isUnitEditable(c)) return;
-      c.unit=inp.value;
-      syncUnitInputs();
-      if(lastFit) drawChart();
-    });
-    sel.addEventListener('change', syncUnitInputs);
-  });
-
-  // yoqish/o'chirish tugmalari va yozuvlar
   const redraw=()=>{ if(lastFit) drawChart(); };
   ['swSmooth','swLegend'].forEach(id=>document.getElementById(id).addEventListener('change', redraw));
-  ['legData','legFit','legSmooth'].forEach(id=>document.getElementById(id).addEventListener('input', redraw));
-
-  // legend joyi
-  const legPos=document.getElementById('legPos');
-  legPos.addEventListener('change',()=>{
-    if(legPos.value!=='custom'){ legendState.pos=null; legendState.preset=legPos.value; }
-    redraw();
-  });
-  document.getElementById('btnLegReset').addEventListener('click',()=>{
-    legendState.pos=null; legendState.preset='auto'; legPos.value='auto';
-    ['legData','legFit','legSmooth'].forEach(id=>{ document.getElementById(id).value=''; });
-    redraw();
-  });
-
   // nazariy qiymat darajasi (faqat son, minus)
   document.getElementById('theorExp').addEventListener('input',e=>{ e.target.value=e.target.value.replace(/[−–—]/g,'-').replace(/[^0-9+-]/g,''); });
-
-  // legendni sichqoncha/barmoq bilan sudrash
-  const cv=document.getElementById('fitCanvas');
-  let drag=null;
-  const LW=640, LH=420;
-  const toLogical=(cx,cy)=>{ const r=cv.getBoundingClientRect(); return {x:(cx-r.left)*(LW/r.width), y:(cy-r.top)*(LH/r.height)}; };
-  const hit=p=>!!legendRect && p.x>=legendRect.x && p.x<=legendRect.x+legendRect.w && p.y>=legendRect.y && p.y<=legendRect.y+legendRect.h;
-  function dragStart(cx,cy){
-    const p=toLogical(cx,cy);
-    if(!hit(p)) return false;
-    drag={dx:p.x-legendRect.x, dy:p.y-legendRect.y};
-    cv.style.cursor='grabbing';
-    return true;
-  }
-  function dragMove(cx,cy){
-    if(!drag) return;
-    const p=toLogical(cx,cy);
-    legendState.pos={x:p.x-drag.dx, y:p.y-drag.dy};
-    legPos.value='custom';
-    drawChart();
-    if(legendRect) legendState.pos={x:legendRect.x, y:legendRect.y};
-  }
-  function dragEnd(){ drag=null; cv.style.cursor=''; }
-  cv.addEventListener('mousedown',e=>{ if(e.button===0 && dragStart(e.clientX,e.clientY)) e.preventDefault(); });
-  window.addEventListener('mousemove',e=>{
-    if(drag){ dragMove(e.clientX,e.clientY); return; }
-    if(e.target===cv){ const on=hit(toLogical(e.clientX,e.clientY)); cv.classList.toggle('leg-hover', on); }
-  });
-  window.addEventListener('mouseup', dragEnd);
-  cv.addEventListener('touchstart',e=>{
-    const tc=e.touches[0];
-    if(tc && dragStart(tc.clientX,tc.clientY)) e.preventDefault();
-  },{passive:false});
-  cv.addEventListener('touchmove',e=>{
-    if(!drag) return;
-    e.preventDefault();
-    const tc=e.touches[0]; if(tc) dragMove(tc.clientX,tc.clientY);
-  },{passive:false});
-  cv.addEventListener('touchend', dragEnd);
-  cv.addEventListener('touchcancel', dragEnd);
+  initChartInteractive();
 }
 
 /* ════════════════════════════════════════════════
@@ -3018,7 +2953,7 @@ function rtParse(S, mode){
         const save=i; i=j+1; while(S[i]===' ') i++;
         const right=parseOperand();
         if(!right){ i=save; break; }
-        if(mode==='num' && !rtIsNumeric(rtUnwrap(left))) left={k:'row', items:[left,{k:'t',s:'/'},right]};
+        if(mode==='none' || (mode==='num' && !rtIsNumeric(rtUnwrap(left)))) left={k:'row', items:[left,{k:'t',s:'/'},right]};
         else left={k:'frac', n:left, d:right};
       }
       items.push(left);
@@ -3081,10 +3016,184 @@ function layoutAxisLabel(ctx, name, unit, maxW){
 }
 
 /* ════════════════════════════════════════════════
+   GRAFIK ICHIDA TAHRIRLASH: sarlavha, o'q nomlari, legend matni (bosib), legend joyi (ushlab sudrash)
+   ════════════════════════════════════════════════ */
+const chartUI = {title:'', xOv:null, yOv:null, legData:'', legFit:'', legSmooth:'', regions:{}, legRows:[], legDefaults:{}};
+
+function splitNameUnit(raw){
+  const m=/^(.*\S)\s+\(([^()]*(?:\([^()]*\)[^()]*)*)\)\s*$/.exec(raw);
+  return m ? {name:m[1], unit:m[2]} : {name:raw, unit:''};
+}
+function buildAxisRootNU(name, unit){
+  const items=[rtParse(name,'all')];
+  if(unit) items.push({k:'t',s:' ('}, rtParse(unit,'num'), {k:'t',s:')'});
+  return {k:'row', items};
+}
+function buildAxisRoot(raw){ const sp=splitNameUnit(raw); return buildAxisRootNU(sp.name, sp.unit); }
+function layoutRichRoot(ctx, root, fs0, maxW, minFs, bold){
+  let fs=fs0, L=rtLay(ctx, root, fs, bold);
+  for(let k=0; k<3 && L.w>maxW && fs>minFs; k++){ fs=Math.max(minFs, fs*maxW/L.w*0.99); L=rtLay(ctx, root, fs, bold); }
+  return L;
+}
+function autoAxisRaw(c, fallback){
+  if(!c) return String(fallback||'');
+  const u=(colUnit(c)||'').trim();
+  return c.header + (u ? ' ('+u+')' : '');
+}
+function updateChartOverlays(hasTitle){
+  const hint=document.getElementById('chartTitleHint'), hov=document.getElementById('chartHover');
+  if(hint) hint.style.display = (lastFit && !hasTitle) ? 'block' : 'none';
+  if(hov) hov.style.display = 'none';
+}
+
+let chartEditor = null;
+function closeChartEditor(doCommit){
+  const ed=chartEditor; if(!ed || ed.done) return;
+  ed.done=true; chartEditor=null;
+  const v=ed.el.value;
+  if(ed.el.parentNode) ed.el.parentNode.removeChild(ed.el);
+  if(doCommit && ed.commit){ ed.commit(v); if(lastFit) drawChart(); }
+}
+// kind: 'title' | 'x' | 'y' | 'leg' (row: legend qatori)
+function openChartEditor(kind, row){
+  if(!lastFit) return;
+  closeChartEditor(true);
+  const cv=document.getElementById('fitCanvas'), stage=document.getElementById('chartStage');
+  const r=cv.getBoundingClientRect(), k=r.width/640;
+  let region, initial, fontPx, bold=false, rotate=false, align='center', commit;
+  const cxo=cols.find(c=>c.id===lastFit.xid), cyo=cols.find(c=>c.id===lastFit.yid);
+  if(kind==='title'){
+    region=chartUI.regions.title || {x:220,y:16,w:200,h:28};
+    initial=chartUI.title; fontPx=17; bold=true;
+    commit=v=>{ chartUI.title=v.trim(); };
+  } else if(kind==='x' || kind==='y'){
+    const isX=kind==='x';
+    region=chartUI.regions[kind]; if(!region) return;
+    const c=isX?cxo:cyo, fb=isX?lastFit.xLabel:lastFit.yLabel, key=isX?'xOv':'yOv';
+    const auto=autoAxisRaw(c, fb);
+    initial = chartUI[key]!=null ? chartUI[key] : auto;
+    fontPx=13; bold=true; rotate=!isX;
+    commit=v=>{ const nv=v.trim(); chartUI[key]=(nv==='' || nv===auto) ? null : nv; };
+  } else if(kind==='leg' && row){
+    region=row; initial=chartUI[row.key] || chartUI.legDefaults[row.key] || '';
+    fontPx=12.5; align='left';
+    const def=chartUI.legDefaults[row.key] || '';
+    commit=v=>{ const nv=v.trim(); chartUI[row.key]=(nv==='' || nv===def) ? '' : nv; };
+  } else return;
+
+  const el=document.createElement('input');
+  el.type='text'; el.className='chart-editor'; el.value=initial||''; el.maxLength=200;
+  el.setAttribute('autocomplete','off'); el.spellcheck=false;
+  el.style.fontSize=(fontPx*k)+'px'; el.style.fontWeight=bold?'700':'400'; el.style.textAlign=align;
+  const hh=Math.max(28, (fontPx+14)*k);
+  if(rotate){
+    const wi=Math.min(Math.max(region.h+60, 240), 400)*k;
+    const cx=Math.max(region.x+region.w/2, (hh/2)/k+2)*k, cy=(region.y+region.h/2)*k;
+    el.style.width=wi+'px'; el.style.height=hh+'px';
+    el.style.left=(cx-wi/2)+'px'; el.style.top=(cy-hh/2)+'px';
+    el.style.transform='rotate(-90deg)';
+  } else {
+    const wl=Math.min(Math.max(region.w+40, kind==='leg'?Math.min(region.w,600):240), 628);
+    const left=Math.max(4, Math.min(640-wl-4, region.x+region.w/2-wl/2));
+    el.style.width=(wl*k)+'px'; el.style.height=hh+'px';
+    el.style.left=(left*k)+'px'; el.style.top=((region.y+region.h/2)*k-hh/2)+'px';
+  }
+  stage.appendChild(el);
+  attachGreek(el);
+  const ed={el, commit, done:false};
+  chartEditor=ed;
+  el.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){ e.preventDefault(); closeChartEditor(true); }
+    else if(e.key==='Escape'){ e.preventDefault(); ed.commit=null; closeChartEditor(false); }
+  });
+  el.addEventListener('blur',()=>closeChartEditor(true));
+  el.focus(); el.select();
+}
+
+function initChartInteractive(){
+  const cv=document.getElementById('fitCanvas'), hov=document.getElementById('chartHover'), hint=document.getElementById('chartTitleHint');
+  const LW=640, LH=420;
+  const toLogical=(cx,cy)=>{ const r=cv.getBoundingClientRect(); return {x:(cx-r.left)*(LW/r.width), y:(cy-r.top)*(LH/r.height)}; };
+  const inBox=(p,b)=>!!b && p.x>=b.x && p.x<=b.x+b.w && p.y>=b.y && p.y<=b.y+b.h;
+  function regionAt(p){
+    if(inBox(p, legendRect)) return {kind:'legend', row:chartUI.legRows.find(r=>inBox(p,r))||null};
+    for(const kk of ['title','x','y']) if(inBox(p, chartUI.regions[kk])) return {kind:kk};
+    return null;
+  }
+  function showHover(b){
+    const k=cv.getBoundingClientRect().width/LW;
+    hov.style.display='block';
+    hov.style.left=(b.x*k)+'px'; hov.style.top=(b.y*k)+'px'; hov.style.width=(b.w*k)+'px'; hov.style.height=(b.h*k)+'px';
+  }
+  function hideHover(){ hov.style.display='none'; }
+  function hoverAt(cx,cy){
+    if(!lastFit) return;
+    const reg=regionAt(toLogical(cx,cy));
+    if(!reg){ hideHover(); cv.style.cursor=''; cv.title=''; return; }
+    showHover(reg.kind==='legend' ? legendRect : chartUI.regions[reg.kind]);
+    cv.style.cursor = reg.kind==='legend' ? 'grab' : 'text';
+    cv.title = reg.kind==='legend' ? t('chartTipLegend') : t('chartTipEdit');
+  }
+
+  // legend: ushlab sudrash yoki (siljitmasdan) bosib matnini o'zgartirish
+  let press=null;
+  function pressStart(cx,cy){
+    if(!lastFit || !legendRect) return false;
+    const p=toLogical(cx,cy);
+    if(!inBox(p, legendRect)) return false;
+    closeChartEditor(true);
+    press={cx, cy, dx:p.x-legendRect.x, dy:p.y-legendRect.y, moved:false, row:chartUI.legRows.find(r=>inBox(p,r))||null};
+    return true;
+  }
+  function pressMove(cx,cy){
+    if(!press) return;
+    if(!press.moved){
+      if(Math.hypot(cx-press.cx, cy-press.cy)<5) return;
+      press.moved=true; cv.style.cursor='grabbing'; hideHover();
+    }
+    const p=toLogical(cx,cy);
+    legendState.pos={x:p.x-press.dx, y:p.y-press.dy};
+    drawChart();
+    if(legendRect) legendState.pos={x:legendRect.x, y:legendRect.y};
+  }
+  function pressEnd(){
+    if(!press) return;
+    const pr=press; press=null; cv.style.cursor='';
+    if(!pr.moved && pr.row) openChartEditor('leg', pr.row);
+  }
+  cv.addEventListener('mousedown',e=>{ if(e.button===0 && pressStart(e.clientX,e.clientY)) e.preventDefault(); });
+  window.addEventListener('mousemove',e=>{
+    if(press){ pressMove(e.clientX,e.clientY); return; }
+    if(e.target===cv) hoverAt(e.clientX,e.clientY);
+  });
+  window.addEventListener('mouseup', pressEnd);
+  cv.addEventListener('mouseleave',()=>{ if(!press){ hideHover(); cv.style.cursor=''; } });
+  cv.addEventListener('click',e=>{
+    if(!lastFit) return;
+    const p=toLogical(e.clientX,e.clientY);
+    if(inBox(p, legendRect)) return;               // legend mouseup'da hal qilinadi
+    const reg=regionAt(p);
+    if(reg && reg.kind!=='legend') openChartEditor(reg.kind);
+  });
+  cv.addEventListener('touchstart',e=>{
+    const tc=e.touches[0];
+    if(tc && pressStart(tc.clientX,tc.clientY)) e.preventDefault();
+  },{passive:false});
+  cv.addEventListener('touchmove',e=>{
+    if(!press) return;
+    e.preventDefault();
+    const tc=e.touches[0]; if(tc) pressMove(tc.clientX,tc.clientY);
+  },{passive:false});
+  cv.addEventListener('touchend', pressEnd);
+  cv.addEventListener('touchcancel', ()=>{ press=null; cv.style.cursor=''; });
+  hint.addEventListener('click', ()=>openChartEditor('title'));
+}
+
+/* ════════════════════════════════════════════════
    INIT
    ════════════════════════════════════════════════ */
 buildGreekPalettes();
-['fName','fExpr','cName','cValue','customFitFormula','chartTitleInput','xUnit','yUnit','legData','legFit','legSmooth'].forEach(id=>attachGreek(document.getElementById(id)));
+['fName','fExpr','cName','cValue','customFitFormula'].forEach(id=>attachGreek(document.getElementById(id)));
 initChartExtras();
 initVideoUI();
 document.querySelectorAll('.sw input').forEach(i=>i.addEventListener('change', syncSwitches));
