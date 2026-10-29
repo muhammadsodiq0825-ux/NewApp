@@ -899,6 +899,12 @@ const I18N_EXTRA3 = {
   }
 };
 Object.keys(I18N_EXTRA3).forEach(k=>Object.assign(I18N[k], I18N_EXTRA3[k]));
+const I18N_EXTRA4 = {
+  uz:{ customDegenerate:"Diqqat: formuladagi ba'zi parametrlar bir-biriga boğliq (masalan, ikkita doimiy qöşiluvçi yoki a·b köpaytma), şuning uçun ularning alohida qiymatlari bir ma'noli aniqlanmaydi. Egri çiziq töğri, lekin parametrlarni alohida talqin qilmang; formulani soddalaştiring." },
+  ru:{ customDegenerate:"Внимание: некоторые параметры в формуле зависят друг от друга (например, два постоянных слагаемых или произведение a·b), поэтому их значения по отдельности определяются неоднозначно. Кривая верна, но не интерпретируйте параметры по отдельности; упростите формулу." },
+  en:{ customDegenerate:"Note: some parameters in the formula depend on each other (e.g. two constant terms or a product a·b), so their individual values are not uniquely determined. The curve is correct, but do not interpret the parameters separately; simplify the formula." }
+};
+Object.keys(I18N_EXTRA4).forEach(k=>Object.assign(I18N[k], I18N_EXTRA4[k]));
 
 /* ════════════════════════════════════════════════
    FORMULA HELP PANEL — TILGA QARAB (uz/ru/en)
@@ -1170,22 +1176,27 @@ function parseExpr(tokens, vars){
       next();
       return val;
     }
-    if(tk.t==='op' && (tk.v==='-'||tk.v==='+')){
-      next();
-      const val=parsePrimary();
-      return tk.v==='-'?-val:val;
-    }
     throw new Error('Formulada xatolik');
   }
+  // Unar minus darajadan KEYIN hisoblanadi: -2^2 = -(2^2) = -4, 2^-2 = 0.25
+  function parseUnary(){
+    const tk=peek();
+    if(tk && tk.t==='op' && (tk.v==='-'||tk.v==='+')){
+      next();
+      const val=parseUnary();
+      return tk.v==='-'?-val:val;
+    }
+    return parsePow();
+  }
   function parsePow(){
-    let left=parsePrimary();
-    if(peek() && peek().v==='^'){ next(); const right=parsePow(); return Math.pow(left,right); }
+    const left=parsePrimary();
+    if(peek() && peek().v==='^'){ next(); const right=parseUnary(); return Math.pow(left,right); }
     return left;
   }
   function parseMul(){
-    let left=parsePow();
+    let left=parseUnary();
     while(peek() && (peek().v==='*'||peek().v==='/'||peek().v==='%')){
-      const op=next().v; const right=parsePow();
+      const op=next().v; const right=parseUnary();
       if(op==='*') left*=right; else if(op==='/') left/=right; else left%=right;
     }
     return left;
@@ -2126,6 +2137,336 @@ function customResiduals(xs, ys, formula, paramNames, paramVals, ysc){
     return (yp - ys[i]) / ysc;
   });
 }
+/* ════════════════════════════════════════════════
+   QO'LDA KIRITILGAN FORMULA: ilmiy aniqlikdagi eng kichik kvadratlar
+   Chiziqli kirgan parametrlar SVD bilan aniq topiladi (variable projection),
+   faqat nochiziqli parametrlar qidiriladi (ko'p boshlang'ich nuqta + Levenberg–Marquardt).
+   ════════════════════════════════════════════════ */
+// A: m ta ustun (har biri n uzunlikda). Natija: eng kichik kvadratlar yechimi (minimal normali), rank.
+function cfSvdSolve(colsA, b, n){
+  const m=colsA.length;
+  const sc=new Array(m), U=[], V=[];
+  for(let j=0;j<m;j++){
+    let s=0; for(let i=0;i<n;i++) s+=colsA[j][i]*colsA[j][i];
+    s=Math.sqrt(s); sc[j]=s;
+    const c=new Array(n); for(let i=0;i<n;i++) c[i]= s>0 ? colsA[j][i]/s : 0;
+    U.push(c);
+    const v=new Array(m).fill(0); v[j]=1; V.push(v);
+  }
+  for(let sweep=0; sweep<80; sweep++){
+    let rotated=false;
+    for(let p=0;p<m-1;p++) for(let q=p+1;q<m;q++){
+      let al=0, be=0, ga=0;
+      for(let i=0;i<n;i++){ al+=U[p][i]*U[p][i]; be+=U[q][i]*U[q][i]; ga+=U[p][i]*U[q][i]; }
+      if(ga===0 || Math.abs(ga)<=1e-15*Math.sqrt(al*be)) continue;
+      rotated=true;
+      const zeta=(be-al)/(2*ga);
+      const tt=(zeta>=0?1:-1)/(Math.abs(zeta)+Math.sqrt(1+zeta*zeta));
+      const c=1/Math.sqrt(1+tt*tt), s=c*tt;
+      for(let i=0;i<n;i++){ const up=U[p][i], uq=U[q][i]; U[p][i]=c*up-s*uq; U[q][i]=s*up+c*uq; }
+      for(let i=0;i<m;i++){ const vp=V[p][i], vq=V[q][i]; V[p][i]=c*vp-s*vq; V[q][i]=s*vp+c*vq; }
+    }
+    if(!rotated) break;
+  }
+  const sv=U.map(u=>Math.sqrt(u.reduce((a,x)=>a+x*x,0)));
+  const smax=Math.max(0,...sv);
+  const tol=1e-10*smax;
+  const xs=new Array(m).fill(0);
+  let rank=0;
+  for(let j=0;j<m;j++){
+    if(!(sv[j]>tol) || sv[j]===0) continue;
+    rank++;
+    let ub=0; for(let i=0;i<n;i++) ub+=U[j][i]*b[i];
+    const coef=ub/(sv[j]*sv[j]);
+    for(let i=0;i<m;i++) xs[i]+=coef*V[j][i];
+  }
+  const x=xs.map((v,i)=> sc[i]>0 ? v/sc[i] : 0);
+  return {x, rank, sv:sv.slice().sort((a,b)=>b-a)};
+}
+
+// Qaysi parametrlar formulaga chiziqli (birgalikda affin) kirishini sonli aniqlaydi
+function cfDetectLinear(evalAt, m, xs){
+  const n=xs.length, take=Math.min(n,6), pts=[];
+  for(let i=0;i<take;i++) pts.push(xs[Math.round(i*(n-1)/Math.max(1,take-1))]);
+  const F=(p)=>{
+    const out=[];
+    for(const x of pts){ let v; try{ v=evalAt(p,x); }catch(e){ return null; } if(!isFinite(v)) return null; out.push(v); }
+    return out;
+  };
+  const xsc0=Math.max(...xs.map(Math.abs))||1;
+  const base=[
+    Array.from({length:m},(_,j)=>0.73+0.31*j+0.05*(j%3)),
+    Array.from({length:m},(_,j)=>1.37+0.17*j-0.02*(j%2))
+  ];
+  // Sinov nuqtalari ma'lumot masshtabida ham olinadi (aks holda exp(-(x-b)^2/c^2) kabi funksiyalar hamma joyda 0 bo'lib qoladi)
+  const seeds=[];
+  [1, xsc0, 1/xsc0].forEach(sc=>base.forEach(bs=>{ const s=bs.map(v=>v*sc); if(F(s)!==null) seeds.push(s); }));
+  if(seeds.length<1) return [];
+  const informative=(...arrs)=>arrs.some(a=>a.some(v=>Math.abs(v)>0));
+  const small=(vals,scale)=>{ for(let i=0;i<vals.length;i++){ if(!(Math.abs(vals[i])<=1e-9*scale[i]+1e-300)) return false; } return true; };
+  const lin=[];
+  // Har xil kattalikdagi qadamlar: ta'siri faqat katta qiymatlarda seziladigan nochiziqli parametrlar ham (masalan β²·x², x~1e-6) topiladi
+  const STEPS=[s=>0.6*(Math.abs(s)+1), s=>1e3, s=>1e6, s=>1e9, s=>1e12];
+  const isLin=(j)=>{
+    let info=false;
+    for(const s of seeds) for(const st of STEPS){
+      const h=st(s[j]);
+      const sp=s.slice(); sp[j]+=h; const sm=s.slice(); sm[j]-=h;
+      const f0=F(s), fp=F(sp), fm=F(sm);
+      if(!f0||!fp||!fm) return false;
+      if(!informative(f0,fp,fm)) continue;
+      info=true;
+      const d2=f0.map((v,i)=>fp[i]+fm[i]-2*v);
+      const sc=f0.map((v,i)=>Math.abs(fp[i])+Math.abs(fm[i])+2*Math.abs(v));
+      if(!small(d2,sc)) return false;
+    }
+    return info;
+  };
+  const cross=(i,j)=>{   // aralash ikkinchi hosila nolmi?
+    let info=false;
+    for(const s of seeds) for(const st of STEPS){
+      const hi=st(s[i]), hj=st(s[j]);
+      const a=s.slice(); a[i]+=hi; const b=s.slice(); b[j]+=hj; const c=s.slice(); c[i]+=hi; c[j]+=hj;
+      const f0=F(s), fa=F(a), fb=F(b), fc=F(c);
+      if(!f0||!fa||!fb||!fc) return false;
+      if(!informative(f0,fa,fb,fc)) continue;
+      info=true;
+      const d=f0.map((v,k)=>fc[k]-fa[k]-fb[k]+v);
+      const sc=f0.map((v,k)=>Math.abs(fc[k])+Math.abs(fa[k])+Math.abs(fb[k])+Math.abs(v));
+      if(!small(d,sc)) return false;
+    }
+    return info;
+  };
+  for(let j=0;j<m;j++){
+    if(!isLin(j)) continue;
+    if(lin.every(i=>cross(i,j))) lin.push(j);
+  }
+  return lin;
+}
+
+// Masshtabga bog'liq bo'lmagan simmetrik tizim yechuvchisi (diagonal bo'yicha tenglashtirib)
+function cfSolveSym(A, b){
+  const k=b.length;
+  const s=A.map((row,i)=>{ const d=Math.sqrt(Math.abs(row[i])); return d>0 ? 1/d : 1; });
+  const M=A.map((row,i)=>row.map((v,j)=>v*s[i]*s[j]).concat([b[i]*s[i]]));
+  for(let c=0;c<k;c++){
+    let piv=c; for(let r=c+1;r<k;r++) if(Math.abs(M[r][c])>Math.abs(M[piv][c])) piv=r;
+    if(!(Math.abs(M[piv][c])>1e-14)) throw new Error('singular');
+    const tmp=M[c]; M[c]=M[piv]; M[piv]=tmp;
+    for(let r=c+1;r<k;r++){ const f=M[r][c]/M[c][c]; for(let j=c;j<=k;j++) M[r][j]-=f*M[c][j]; }
+  }
+  const y=new Array(k).fill(0);
+  for(let r=k-1;r>=0;r--){ let v=M[r][k]; for(let j=r+1;j<k;j++) v-=M[r][j]*y[j]; y[r]=v/M[r][r]; }
+  return y.map((v,i)=>v*s[i]);
+}
+
+// Levenberg–Marquardt (masshtabga bog'liq bo'lmagan demping). resFn(q) -> qoldiq vektori yoki null.
+function cfLM(resFn, q0, maxIter){
+  let q=q0.slice(), r=resFn(q);
+  if(!r) return null;
+  const sumsq=v=>{ let s=0; for(let i=0;i<v.length;i++) s+=v[i]*v[i]; return s; };
+  let cost=sumsq(r);
+  const k=q.length, n=r.length;
+  if(k===0) return {q, cost};
+  let lam=1e-3;
+  for(let iter=0; iter<(maxIter||100); iter++){
+    const J=[];
+    let bad=false;
+    for(let j=0;j<k;j++){
+      let h=Math.abs(q[j])*1e-6 || 1e-9;
+      let q2=q.slice(); q2[j]+=h; let r2=resFn(q2);
+      if(!r2){ h=-h; q2=q.slice(); q2[j]+=h; r2=resFn(q2); }
+      if(!r2){ bad=true; break; }
+      J.push(r2.map((v,i)=>(v-r[i])/h));
+    }
+    if(bad) break;
+    const JTJ=Array.from({length:k},()=>new Array(k).fill(0)), JTr=new Array(k).fill(0);
+    for(let a=0;a<k;a++){
+      for(let b=0;b<k;b++){ let s=0; for(let i=0;i<n;i++) s+=J[a][i]*J[b][i]; JTJ[a][b]=s; }
+      let s2=0; for(let i=0;i<n;i++) s2+=J[a][i]*r[i]; JTr[a]=s2;
+    }
+    const dmax=Math.max(...JTJ.map((row,i)=>row[i]),1e-300);
+    let improved=false;
+    for(let att=0; att<14; att++){
+      const A=JTJ.map((row,i)=>row.map((v,j)=> i===j ? v+lam*Math.max(v,1e-12*dmax) : v));
+      let d; try{ d=cfSolveSym(A, JTr.map(v=>-v)); }catch(e){ lam*=10; continue; }
+      const qn=q.map((v,i)=>v+(d[i]||0));
+      const rn=resFn(qn);
+      const cn=rn?sumsq(rn):Infinity;
+      if(rn && isFinite(cn) && cn<cost){
+        const rel=(cost-cn)/Math.max(cost,1e-300);
+        q=qn; r=rn; cost=cn; lam=Math.max(lam/5,1e-12); improved=true;
+        if(rel<1e-13) iter=1e9;
+        break;
+      } else lam*=5;
+    }
+    if(!improved) break;
+    if(cost<1e-30) break;
+  }
+  return {q, cost};
+}
+
+function cfCandidateValues(xsc, ysc, span, npts){
+  const scales=[1, 1/xsc, xsc, 1/ysc, ysc, ysc/xsc, ysc/(xsc*xsc), Math.sqrt(ysc)/xsc, Math.sqrt(ysc), 1/(xsc*xsc)];
+  const seen=new Set(), logPos=[], specPos=[];
+  const add=(arr,v)=>{ if(!isFinite(v)||v<=0) return; const key=v.toPrecision(3); if(!seen.has(key)){ seen.add(key); arr.push(v); } };
+  // maxsus (siyraklashtirilmaydigan) qiymatlar: faza/burchaklar va tebranish chastotalari (ma'lumot oralig'iga teng qadamli)
+  for(let k=1;k<=6;k++) add(specPos,k*Math.PI/6);
+  [0.5,1.5,2,3,4,5,8].forEach(v=>add(specPos,v));
+  if(span>0){ const nf=Math.min(10, Math.max(6, Math.ceil(npts/2))); for(let k=1;k<=4*nf;k++) add(specPos, 2*Math.PI*(k*0.25)/span); }
+  scales.forEach(s=>{ for(let t=-8;t<=8;t++) add(logPos, s*Math.pow(10,t/4)); });   // 0.25 dekada qadam
+  const sym=arr=>{ const s=arr.slice().sort((a,b)=>a-b); return s.slice().reverse().map(v=>-v).concat(s); };
+  return {log:sym(logPos), special:sym(specPos)};
+}
+function cfThin(arr, count){
+  if(arr.length<=count) return arr.slice();
+  const out=[]; for(let i=0;i<count;i++) out.push(arr[Math.round(i*(arr.length-1)/(count-1))]);
+  return out;
+}
+
+// Asosiy funksiya. evalAt(pv,x) -> y. Natija: {p, cost, rank, degenerate, lin}
+function cfFit(evalAt, m, xs, ys, budgetMs){
+  const n=xs.length, t0=performance.now();
+  const timeUp=()=>performance.now()-t0>budgetMs;
+  const ysc=Math.max(...ys.map(Math.abs))||1, xsc=Math.max(...xs.map(Math.abs))||1;
+  const lin=cfDetectLinear(evalAt,m,xs);
+  const qIdx=[]; for(let j=0;j<m;j++) if(!lin.includes(j)) qIdx.push(j);
+  const k=qIdx.length;
+
+  function project(q){
+    const p=new Array(m).fill(0);
+    qIdx.forEach((j,a)=>{ p[j]=q[a]; });
+    const B0=new Array(n);
+    for(let i=0;i<n;i++){ let v; try{ v=evalAt(p,xs[i]); }catch(e){ return null; } if(!isFinite(v)) return null; B0[i]=v; }
+    const colsA=[];
+    const b0=Math.max(0,...B0.map(Math.abs));
+    for(const j of lin){
+      // Bazis ustuni (f(δ)−f(0))/δ: δ shunday tanlanadiki, ayirma B0 ning yaxlitlash xatosida yo'qolmasin
+      let delta=1, c=null;
+      for(let tries=0; tries<4; tries++){
+        p[j]=delta;
+        const fj=new Array(n); let d=0;
+        for(let i=0;i<n;i++){ let v; try{ v=evalAt(p,xs[i]); }catch(e){ p[j]=0; return null; } if(!isFinite(v)){ p[j]=0; return null; } fj[i]=v; d=Math.max(d,Math.abs(v-B0[i])); }
+        c=fj.map((v,i)=>(v-B0[i])/delta);
+        if(!(b0>0) || d>=1e-2*b0) break;
+        delta = d>0 ? delta*b0/d : delta*1e6;
+      }
+      p[j]=0; colsA.push(c);
+    }
+    let L=[];
+    if(lin.length){ L=cfSvdSolve(colsA, ys.map((y,i)=>y-B0[i]), n).x; }
+    const r=new Array(n);
+    for(let i=0;i<n;i++){ let v=B0[i]; for(let a=0;a<lin.length;a++) v+=L[a]*colsA[a][i]; r[i]=(v-ys[i])/ysc; }
+    lin.forEach((j,a)=>{ p[j]=L[a]; });
+    return {r, p, colsA};
+  }
+  const resVP=(q)=>{ const o=project(q); return o ? o.r : null; };
+  const costOf=(q)=>{ const r=resVP(q); if(!r) return Infinity; let s=0; for(let i=0;i<r.length;i++) s+=r[i]*r[i]; return s; };
+
+  let bestQ=null, bestCost=Infinity;
+  const consider=(q,c)=>{ if(c<bestCost){ bestCost=c; bestQ=q.slice(); } };
+
+  if(k===0){
+    const c=costOf([]); if(isFinite(c)) consider([],c);
+  } else {
+    const xmn=Math.min(...xs), xmx=Math.max(...xs);
+    const cv=cfCandidateValues(xsc,ysc,xmx-xmn,n);
+    let cand=cv.log.concat(cv.special).sort((a,b)=>a-b);
+    // bitta baholash qancha vaqt olishini o'lchab, to'r o'lchamini byudjetga moslaymiz
+    const tp=performance.now(); let probe=0;
+    for(let i=0;i<30;i++){ costOf(new Array(k).fill(cand[(i*7)%cand.length])); probe++; }
+    const perEval=Math.max((performance.now()-tp)/probe, 1e-4);
+    const maxEvals=(k===2?18000:9000);   // to'r o'lchami vaqtga bog'liq emas (natija har gal bir xil); vaqt tugasa — to'r aralash tartibda kesiladi
+    const starts=[];   // {q,cost}
+    if(k===1){
+      const cs=cand.map(v=>costOf([v]));
+      for(let i=0;i<cand.length;i++){
+        if(!isFinite(cs[i])) continue;
+        const l=i>0?cs[i-1]:Infinity, r=i<cand.length-1?cs[i+1]:Infinity;
+        if(cs[i]<=l && cs[i]<=r) starts.push({q:[cand[i]],cost:cs[i]});
+      }
+      cs.forEach((c,i)=>{ if(isFinite(c)) starts.push({q:[cand[i]],cost:c}); });
+    } else if(k<=3){
+      const L=Math.max(10, Math.floor(Math.pow(maxEvals,1/k)));
+      const sp=cfThin(cv.special, Math.max(4, Math.min(cv.special.length, Math.floor(L*0.8))));
+      const lg=cfThin(cv.log, Math.max(6, L-sp.length));
+      const cc=lg.concat(sp).sort((a,b)=>a-b);
+      const total=Math.pow(cc.length,k);
+      const gcd=(a,b)=>b?gcd(b,a%b):a;
+      let step=Math.max(1,Math.floor(total*0.6180339887)); while(gcd(step,total)!==1) step++;
+      for(let c=0;c<total && !timeUp();c++){
+        let rem=(c*step)%total; const q=[]; for(let a=0;a<k;a++){ q.push(cc[rem%cc.length]); rem=Math.floor(rem/cc.length); }
+        const cs=costOf(q); if(isFinite(cs)) starts.push({q,cost:cs});
+      }
+    } else {
+      let seed=987654321; const rnd=()=>{ seed=(seed*1664525+1013904223)%4294967296; return seed/4294967296; };
+      for(let c=0;c<Math.min(maxEvals,6000) && !timeUp();c++){
+        const q=[]; for(let a=0;a<k;a++) q.push(cand[Math.floor(rnd()*cand.length)]);
+        const cs=costOf(q); if(isFinite(cs)) starts.push({q,cost:cs});
+      }
+    }
+    starts.sort((a,b)=>a.cost-b.cost);
+    const chosen=[];
+    const sameBasin=(a,b)=>a.every((v,i)=>Math.sign(v)===Math.sign(b[i]) && Math.abs(Math.log10(Math.abs(v)||1e-300)-Math.log10(Math.abs(b[i])||1e-300))<0.12);
+    for(const s of starts){ if(chosen.length>=12) break; if(!chosen.some(c=>sameBasin(c.q,s.q))) chosen.push(s); }
+    // eng yaxshi nomzodlar atrofida mahalliy zichlashtirish (ko'paytma koeffitsientlari bo'yicha)
+    if(k<=3){
+      const fac=[0.7,0.85,1,1.18,1.4];
+      chosen.slice(0,3).forEach(s0=>{
+        const tot=Math.pow(fac.length,k);
+        for(let c=0;c<tot && !timeUp();c++){
+          let rem=c; const q=[]; for(let a=0;a<k;a++){ q.push(s0.q[a]*fac[rem%fac.length]); rem=Math.floor(rem/fac.length); }
+          const cs=costOf(q); if(isFinite(cs)) starts.push({q,cost:cs});
+        }
+      });
+      starts.sort((a,b)=>a.cost-b.cost);
+      chosen.length=0;
+      for(const s of starts){ if(chosen.length>=10) break; if(!chosen.some(c=>sameBasin(c.q,s.q))) chosen.push(s); }
+    }
+    for(const s of chosen){
+      if(timeUp() && bestQ) break;
+      const res=cfLM(resVP, s.q, 150);
+      if(res) consider(res.q,res.cost); else consider(s.q,s.cost);
+    }
+  }
+  if(!bestQ) return null;
+  let sol=project(bestQ);
+  if(!sol) return null;
+  let p=sol.p.slice();
+
+  // Hamma parametrlar bo'yicha yakuniy silliqlash
+  const resFull=(pv)=>{
+    const r=new Array(n);
+    for(let i=0;i<n;i++){ let v; try{ v=evalAt(pv,xs[i]); }catch(e){ return null; } if(!isFinite(v)) return null; r[i]=(v-ys[i])/ysc; }
+    return r;
+  };
+  const rf=resFull(p);
+  if(!rf) return null;
+  let cost=rf.reduce((a,v)=>a+v*v,0);
+  if(m<=10 && cost>1e-28){
+    const pol=cfLM(resFull, p, 60);
+    if(pol && pol.cost<cost){ p=pol.q; cost=pol.cost; }
+  }
+
+  // Parametrlar bir-biriga bog'liqmi (masalan y0 va γ₂ ikkalasi bitta doimiy)?
+  let degenerate=false, rank=m;
+  try{
+    const o=project(qIdx.map(j=>p[j]));
+    const r0=resFull(p), colsJ=new Array(m);
+    lin.forEach((j,a)=>{ colsJ[j]=o.colsA[a].map(v=>v/ysc); });
+    for(const j of qIdx){
+      const h=Math.abs(p[j])*1e-6 || 1e-8;
+      const p2=p.slice(); p2[j]+=h; const r2=resFull(p2);
+      colsJ[j]= r2 ? r2.map((v,i)=>(v-r0[i])/h) : new Array(n).fill(0);
+    }
+    const sv=cfSvdSolve(colsJ, new Array(n).fill(0), n);
+    const smax=sv.sv[0]||0;
+    rank=sv.sv.filter(s=>s>1e-8*smax).length;
+    degenerate = rank<m;
+  }catch(e){}
+  return {p, cost, rank, degenerate, lin};
+}
+
 function customRegression(xs, ys, formula){
   if(!formula || !formula.trim()) throw new Error(t('noCustomFormula'));
   formula = normalizeCustomFormula(latexToGreek(formula.trim()));
@@ -2158,75 +2499,9 @@ function customRegression(xs, ys, formula){
   }
   if(n<=m) throw new Error(t('needMorePoints'));
 
-  const ysc = Math.max(...ys.map(Math.abs)) || 1;
-  const xsc = Math.max(...xs.map(Math.abs)) || 1;
-  const resid = (pv)=> xs.map((x,i)=>{
-    let yp; try{ yp = evalAt(pv, x); }catch(e){ yp = NaN; }
-    if(!isFinite(yp)) yp = ys[i] + 1e6*ysc;
-    return (yp - ys[i]) / ysc;
-  });
-  const cost = (pv)=>{ const r=resid(pv); let s=0; for(let i=0;i<r.length;i++) s+=r[i]*r[i]; return s; };
-
-  // Levenberg–Marquardt (bitta boshlang'ich nuqtadan)
-  function lm(p0){
-    let p = p0.slice();
-    let lambda = 1e-2, cur = cost(p);
-    if(!isFinite(cur)) return {p, cost:Infinity};
-    for(let iter=0; iter<300; iter++){
-      const r = resid(p);
-      const J = Array.from({length:n}, ()=>new Array(m).fill(0));
-      for(let j=0;j<m;j++){
-        const h = Math.max(Math.abs(p[j])*1e-5, 1e-12);
-        const p2 = p.slice(); p2[j] += h;
-        const r2 = resid(p2);
-        for(let i=0;i<n;i++) J[i][j] = (r2[i]-r[i])/h;
-      }
-      const JTJ = Array.from({length:m}, ()=>new Array(m).fill(0));
-      const JTr = new Array(m).fill(0);
-      for(let a=0;a<m;a++){
-        for(let b=0;b<m;b++){ let s=0; for(let i=0;i<n;i++) s+=J[i][a]*J[i][b]; JTJ[a][b]=s; }
-        let s2=0; for(let i=0;i<n;i++) s2+=J[i][a]*r[i]; JTr[a]=s2;
-      }
-      let improved = false;
-      for(let attempt=0; attempt<12; attempt++){
-        const A = JTJ.map((row,i)=> row.map((v,j)=> i===j ? v+lambda*Math.max(Math.abs(v),1e-6) : v));
-        let delta;
-        try{ delta = solveLinearSystem(A, JTr.map(v=>-v)); }catch(e){ lambda*=10; continue; }
-        const newP = p.map((v,i)=> v+(delta[i]||0));
-        const nc = cost(newP);
-        if(isFinite(nc) && nc<cur){
-          const rel = (cur-nc)/Math.max(cur,1e-300);
-          p = newP; cur = nc; lambda = Math.max(lambda/10,1e-12); improved = true;
-          if(rel<1e-12) iter = 1e9;
-          break;
-        } else { lambda*=10; }
-      }
-      if(!improved) break;
-      if(cur<1e-14) break;
-    }
-    return {p, cost:cur};
-  }
-
-  // Ko'p boshlang'ich nuqta — yomon taxmin tufayli noto'g'ri natija chiqmasligi uchun
-  const starts = [];
-  starts.push(paramNames.map((_,i)=> 1+i*0.3));
-  [1, 0.1, 10, -1].forEach(v=> starts.push(paramNames.map(()=>v)));
-  starts.push(paramNames.map((_,i)=> i===0 ? ysc : 1/xsc));
-  starts.push(paramNames.map((_,i)=> i===0 ? ysc/xsc : 1));
-  starts.push(paramNames.map((_,i)=> i===0 ? -ysc : 1));
-  let seed = 12345;
-  const rnd = ()=>{ seed = (seed*1664525 + 1013904223) % 4294967296; return seed/4294967296; };
-  for(let k=0;k<8;k++) starts.push(paramNames.map(()=> (rnd()<0.5?-1:1) * Math.pow(10, -2+4*rnd())));
-  const t0 = performance.now();
-  let best = null;
-  for(const s0 of starts){
-    if(best && performance.now()-t0 > 1500) break;
-    let res; try{ res = lm(s0); }catch(e){ continue; }
-    if(!best || res.cost < best.cost) best = res;
-    if(best.cost < 1e-12) break;
-  }
-  if(!best || !isFinite(best.cost)) throw new Error(t('customFitFailed'));
-  const p = best.p;
+  const res = cfFit(evalAt, m, xs, ys, 2500);
+  if(!res || !isFinite(res.cost)) throw new Error(t('customFitFailed'));
+  const p = res.p;
 
   const predict = (x)=>{ try{ return evalAt(p, x); }catch(e){ return NaN; } };
   const yPred = xs.map(predict);
@@ -2234,7 +2509,7 @@ function customRegression(xs, ys, formula){
   if(!isFinite(r2) || paramNames.some((_,i)=>!isFinite(p[i]))) throw new Error(t('customFitFailed'));
   const eqParts = paramNames.map((pn,i)=> `${pn} = ${numSigned(p[i])}`).join(',  ');
   const unknownConsts = [];   // dastur hech qanday nomni (pi, e, k ...) oldindan bilmaydi
-  return {type:'custom', coeffs:p, r2, n, params:m, predict, equation:`y = ${formula}   (${eqParts})`, customFormula:formula, paramNames, unknownConsts};
+  return {type:'custom', coeffs:p, r2, n, params:m, predict, equation:`y = ${formula}   (${eqParts})`, customFormula:formula, paramNames, unknownConsts, degenerate:!!res.degenerate};
 }
 function computeFit(xs, ys, type, customFormulaOverride){
   if(type==='linear') return polyRegression(xs,ys,1);
@@ -2272,6 +2547,8 @@ function refreshChartUI(){
   }
   if(sw.checked && lastFit.fit && lastFit.fit.unknownConsts && lastFit.fit.unknownConsts.length){
     setChartMsg(t('customPiWarn').replace('{n}', lastFit.fit.unknownConsts.join(', ')), 'warn');
+  } else if(sw.checked && lastFit.fit && lastFit.fit.degenerate){
+    setChartMsg(t('customDegenerate'), 'warn');
   } else if(!lastFit.fitFailed || !sw.checked){
     setChartMsg('');
   }
@@ -2374,7 +2651,15 @@ function drawChart(){
 
   // O'q sonlari (ayniqsa 1.5×10⁻⁹ kabi uzun yorliqlar) o'q nomini kesib qo'ymasligi uchun chap/o'ng joy o'lchanadi
   const ticks=6;
-  const fx=makeTickFormatter(X0,X1,ticks), fy=makeTickFormatter(Y0,Y1,ticks);
+  // Hamma sonlar tagida bir xil 10^n takrorlanmasin: umumiy daraja o'q nomiga («T, 10^-6 s») chiqariladi
+  const axisExp=(a,b)=>{ const mx=Math.max(Math.abs(a),Math.abs(b)); return (mx>0 && (mx>=1e5 || mx<1e-3)) ? Math.floor(Math.log10(mx)+1e-12) : 0; };
+  chartUI.xExpAuto=axisExp(X0,X1); chartUI.yExpAuto=axisExp(Y0,Y1);
+  const factorOk=(ov,n)=> n!==0 && (ov===null || ov===undefined || labelHasFactor(ov,n));   // qo'lda yozilgan nomda 10^n bo'lmasa, sonlar o'z darajasi bilan yoziladi
+  chartUI.xExp = factorOk(chartUI.xOv, chartUI.xExpAuto) ? chartUI.xExpAuto : 0;
+  chartUI.yExp = factorOk(chartUI.yOv, chartUI.yExpAuto) ? chartUI.yExpAuto : 0;
+  const xDiv=Math.pow(10,chartUI.xExp), yDiv=Math.pow(10,chartUI.yExp);
+  const fxB=makeTickFormatter(X0/xDiv,X1/xDiv,ticks), fyB=makeTickFormatter(Y0/yDiv,Y1/yDiv,ticks);
+  const fx=v=>fxB(v/xDiv), fy=v=>fyB(v/yDiv);
   ctx.font='11px Segoe UI';
   let maxYW=0;
   for(let i=0;i<=ticks;i++) maxYW=Math.max(maxYW, ctx.measureText(fy(Y0+(Y1-Y0)*i/ticks)).width);
@@ -2409,16 +2694,12 @@ function drawChart(){
 
   // ── O'Q NOMLARI (rasm tarkibida) ──
   ctx.fillStyle='#0f172a'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  const axisRoot=(c, fallback, ov)=>{
-    if(ov!==null && ov!==undefined) return buildAxisRoot(latexToGreek(ov));
-    if(c) return buildAxisRootNU(latexToGreek(c.header), latexToGreek(colUnit(c).trim()));
-    return buildAxisRoot(latexToGreek(String(fallback||'')));
-  };
-  const XL = layoutRichRoot(ctx, axisRoot(cxo, lastFit.xLabel, chartUI.xOv), 13, W-padL-padR, 8, true);
+  const axisRoot=(c, fallback, ov, n)=> buildAxisRoot(latexToGreek(ov!==null && ov!==undefined ? ov : autoAxisRaw(c, fallback, n)));
+  const XL = layoutRichRoot(ctx, axisRoot(cxo, lastFit.xLabel, chartUI.xOv, chartUI.xExp), 13, W-padL-padR, 8, true);
   const xBase = Math.min(H-12, H-4-XL.d), xLeft = (padL+W-padR)/2 - XL.w/2;
   XL.draw(xLeft, xBase);
   { const rw=Math.max(XL.w+12,110); chartUI.regions.x={x:(padL+W-padR)/2-rw/2, y:xBase-Math.max(XL.a,12)-4, w:rw, h:Math.max(XL.a,12)+Math.max(XL.d,6)+8}; }
-  const YL = layoutRichRoot(ctx, axisRoot(cyo, lastFit.yLabel, chartUI.yOv), 13, H-pad-padT, 8, true);
+  const YL = layoutRichRoot(ctx, axisRoot(cyo, lastFit.yLabel, chartUI.yOv, chartUI.yExp), 13, H-pad-padT, 8, true);
   const yBaseX = Math.max(17, 4+YL.a), yCy = (padT+H-pad)/2;
   ctx.save(); ctx.translate(yBaseX, yCy); ctx.rotate(-Math.PI/2);
   YL.draw(-YL.w/2, 0); ctx.restore();
@@ -2473,30 +2754,38 @@ function drawChart(){
     const lv=k=>latexToGreek((chartUI[k]||'').trim());
     chartUI.legDefaults={legData:t('legendData'), legFit:(fit?fit.equation:''), legSmooth:t('legendSmooth')};
     const legendItems=[{key:'legData', kind:'point', color:'#dc2626', label:lv('legData')||t('legendData')}];
-    if(showFit) legendItems.push({key:'legFit', kind:'line', color:'#1d4ed8', label:lv('legFit')||fit.equation});
+    if(showFit) legendItems.push({key:'legFit', kind:'line', color:'#1d4ed8', label:lv('legFit')||fit.equation.replace(/\s{3}\(/,'\n(')});
     if(showSmooth) legendItems.push({key:'legSmooth', kind:'line', color:'#0d9488', label:lv('legSmooth')||t('legendSmooth')});
     const maxLegendW=W-padL-padR-24;
-    let legendFont=12.5;
-    ctx.font=legendFont+'px Segoe UI';
     const markerW=24, rowGap=6, padX=12, padY=10;
-    function widestLabel(){
-      return Math.max(...legendItems.map(it=>ctx.measureText(it.label).width));
-    }
-    while(widestLabel()+markerW+8>maxLegendW-padX*2 && legendFont>9){
-      legendFont-=0.5;
-      ctx.font=legendFont+'px Segoe UI';
-    }
     const maxTextW=maxLegendW-padX*2-markerW-8;
-    legendItems.forEach(it=>{ it.label=fitText(it.label, maxTextW); });
-    const rowH=legendFont+9;
-    const boxW=Math.min(maxLegendW, padX*2+markerW+8+widestLabel());
-    const boxH=padY*2+rowH*legendItems.length+rowGap*(legendItems.length-1);
+    let legendFont=12.5, Ls;
+    for(;;){
+      Ls=legendItems.map(it=>layoutMultiline(ctx, it.label, legendFont, 'all'));
+      if(Math.max(...Ls.map(l=>l.w))<=maxTextW || legendFont<=9) break;
+      legendFont-=0.5;
+    }
+    const rowHs=Ls.map(l=>Math.max(legendFont+9, l.a+l.d+6));
+    const boxW=Math.min(maxLegendW, padX*2+markerW+8+Math.max(...Ls.map(l=>l.w)));
+    const boxH=padY*2+rowHs.reduce((a,b)=>a+b,0)+rowGap*(legendItems.length-1);
     let boxX, boxY;
     if(legendState.pos){ boxX=legendState.pos.x; boxY=legendState.pos.y; }
     else {
-      const pr=legendState.preset;
-      boxX=(pr==='tr'||pr==='br') ? (W-padR-boxW-8) : (padL+8);
-      boxY=(pr==='bl'||pr==='br') ? (H-pad-boxH-8) : (padT+8);
+      const corners={tl:[padL+8,padT+8], tr:[W-padR-boxW-8,padT+8], bl:[padL+8,H-pad-boxH-8], br:[W-padR-boxW-8,H-pad-boxH-8]};
+      let pr=legendState.preset;
+      if(!corners[pr]){
+        // avtomatik joy: nuqtalar va egri chiziqni eng kam yopadigan burchak
+        const pts=xs.map((x,i)=>[sx(x), sy(ys[i])]);
+        if(showFit && fit){ for(let i=0;i<=60;i++){ const xv=X0+(X1-X0)*i/60, yv=fit.predict(xv); if(isFinite(yv)) pts.push([sx(xv), sy(yv)]); } }
+        if(showSmooth){ const sp=smoothCurve(xs,ys); if(sp) sp.forEach((q,i)=>{ if(i%3===0) pts.push([sx(q[0]), sy(q[1])]); }); }
+        let bestN=Infinity; pr='tl';
+        ['tl','tr','bl','br'].forEach(c=>{
+          const bx=corners[c][0], by=corners[c][1]; let cnt=0;
+          pts.forEach(([px,py])=>{ if(px>=bx-8 && px<=bx+boxW+8 && py>=by-8 && py<=by+boxH+8) cnt++; });
+          if(cnt<bestN){ bestN=cnt; pr=c; }
+        });
+      }
+      boxX=corners[pr][0]; boxY=corners[pr][1];
     }
     boxX=Math.max(0, Math.min(W-boxW, boxX));
     boxY=Math.max(0, Math.min(H-boxH, boxY));
@@ -2505,8 +2794,9 @@ function drawChart(){
     ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1;
     roundRectPath(ctx, boxX, boxY, boxW, boxH, 8);
     ctx.fill(); ctx.stroke();
+    let yy=boxY+padY;
     legendItems.forEach((item,i)=>{
-      const rowY=boxY+padY+rowH*i+rowGap*i+rowH/2;
+      const rowH=rowHs[i], rowY=yy+rowH/2; yy+=rowH+rowGap;
       chartUI.legRows.push({key:item.key, x:boxX, y:rowY-rowH/2, w:boxW, h:rowH});
       if(item.kind==='point'){
         ctx.fillStyle=item.color;
@@ -2515,8 +2805,12 @@ function drawChart(){
         ctx.strokeStyle=item.color; ctx.lineWidth=2.4;
         ctx.beginPath(); ctx.moveTo(boxX+padX, rowY); ctx.lineTo(boxX+padX+markerW, rowY); ctx.stroke();
       }
-      ctx.fillStyle='#1e293b'; ctx.font=legendFont+'px Segoe UI'; ctx.textAlign='left'; ctx.textBaseline='middle';
-      ctx.fillText(item.label, boxX+padX+markerW+8, rowY);
+      const L=Ls[i], tx=boxX+padX+markerW+8;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(tx, rowY-rowH/2, boxX+boxW-padX-tx+4, rowH); ctx.clip();
+      ctx.fillStyle='#1e293b'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+      L.draw(tx, rowY+(L.a-L.d)/2);
+      ctx.restore();
     });
     ctx.textBaseline='alphabetic';
   }
@@ -2806,7 +3100,7 @@ function axisLabel(c){
   if(!c) return '';
   const u=latexToGreek(colUnit(c).trim());
   const h=latexToGreek(c.header);
-  return u ? h+' ('+u+')' : h;
+  return u ? h+', '+u : h;
 }
 function syncUnitInputs(){
   [['xCol','xUnit'],['yCol','yUnit']].forEach(([sid,uid])=>{
@@ -3006,6 +3300,15 @@ function rtLay(ctx, node, fs, bold){
   return {w:0,a:0,d:0,draw:()=>{}};
 }
 // Grafik o'q yozuvi: «nomi (birlik)» — nomida kasr/daraja/indeks, birlikda 1/m² kabi
+function layoutMultiline(ctx, label, fs, mode){
+  const parts=String(label).split('\n').map(l=>rtLay(ctx, rtParse(l,mode), fs, false));
+  if(parts.length===1) return parts[0];
+  const gap=4; let h=0; const tops=[];
+  parts.forEach(q=>{ tops.push(h+q.a); h+=q.a+q.d+gap; });
+  h-=gap;
+  return {w:Math.max(...parts.map(q=>q.w)), a:parts[0].a, d:h-parts[0].a,
+    draw:(x,y)=>{ parts.forEach((q,i)=>q.draw(x, y+(tops[i]-tops[0]))); }};
+}
 function layoutAxisLabel(ctx, name, unit, maxW){
   const items=[rtParse(name,'all')];
   if(unit) items.push({k:'t',s:' ('}, rtParse(unit,'num'), {k:'t',s:')'});
@@ -3021,12 +3324,19 @@ function layoutAxisLabel(ctx, name, unit, maxW){
 const chartUI = {title:'', xOv:null, yOv:null, legData:'', legFit:'', legSmooth:'', regions:{}, legRows:[], legDefaults:{}};
 
 function splitNameUnit(raw){
-  const m=/^(.*\S)\s+\(([^()]*(?:\([^()]*\)[^()]*)*)\)\s*$/.exec(raw);
-  return m ? {name:m[1], unit:m[2]} : {name:raw, unit:''};
+  // oxirgi (qavsdan tashqaridagi) vergul nomni birlikdan ajratadi: «T, 10^-6 s»
+  let depth=0, idx=-1;
+  for(let i=0;i<raw.length;i++){
+    const ch=raw[i];
+    if(ch==='(') depth++; else if(ch===')') depth=Math.max(0,depth-1);
+    else if(ch===',' && depth===0) idx=i;
+  }
+  if(idx<0) return {name:raw.trim(), unit:''};
+  return {name:raw.slice(0,idx).trim(), unit:raw.slice(idx+1).trim()};
 }
 function buildAxisRootNU(name, unit){
   const items=[rtParse(name,'all')];
-  if(unit) items.push({k:'t',s:' ('}, rtParse(unit,'num'), {k:'t',s:')'});
+  if(unit) items.push({k:'t',s:', '}, rtParse(unit,'num'));
   return {k:'row', items};
 }
 function buildAxisRoot(raw){ const sp=splitNameUnit(raw); return buildAxisRootNU(sp.name, sp.unit); }
@@ -3035,10 +3345,17 @@ function layoutRichRoot(ctx, root, fs0, maxW, minFs, bold){
   for(let k=0; k<3 && L.w>maxW && fs>minFs; k++){ fs=Math.max(minFs, fs*maxW/L.w*0.99); L=rtLay(ctx, root, fs, bold); }
   return L;
 }
-function autoAxisRaw(c, fallback){
-  if(!c) return String(fallback||'');
-  const u=(colUnit(c)||'').trim();
-  return c.header + (u ? ' ('+u+')' : '');
+function autoAxisRaw(c, fallback, n){
+  const name = c ? c.header : String(fallback||'');
+  const u = c ? (colUnit(c)||'').trim() : '';
+  const tail = [n ? '10^'+n : '', u].filter(Boolean).join(' ');
+  return tail ? name+', '+tail : name;
+}
+function labelHasFactor(ov, n){
+  const re=/10\s*\^\s*\(?\s*([-−+]?\d+)\s*\)?/g;
+  let m;
+  while((m=re.exec(String(ov)))){ if(parseInt(m[1].replace('−','-'),10)===n) return true; }
+  return false;
 }
 function updateChartOverlays(hasTitle){
   const hint=document.getElementById('chartTitleHint'), hov=document.getElementById('chartHover');
@@ -3070,7 +3387,7 @@ function openChartEditor(kind, row){
     const isX=kind==='x';
     region=chartUI.regions[kind]; if(!region) return;
     const c=isX?cxo:cyo, fb=isX?lastFit.xLabel:lastFit.yLabel, key=isX?'xOv':'yOv';
-    const auto=autoAxisRaw(c, fb);
+    const auto=autoAxisRaw(c, fb, isX?chartUI.xExpAuto:chartUI.yExpAuto);
     initial = chartUI[key]!=null ? chartUI[key] : auto;
     fontPx=13; bold=true; rotate=!isX;
     commit=v=>{ const nv=v.trim(); chartUI[key]=(nv==='' || nv===auto) ? null : nv; };
