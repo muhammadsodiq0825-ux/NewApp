@@ -1446,7 +1446,7 @@ function addTable(){
 }
 const PREFIXES=['n','m','p','q','r','s','u','v','w','k','l','g'];
 function allCols(){ const o=[]; tables.forEach((T,i)=>(i===curTab?cols:T.cols).forEach(c=>o.push(c))); return o; }
-function findCol(id){ return findCol(id)||allCols().find(c=>c.id===id); }
+function findCol(id){ return cols.find(c=>c.id===id)||allCols().find(c=>c.id===id); }
 function autoName(ti,k){ const used=new Set(allCols().map(c=>c.header)); const pf=PREFIXES[ti%PREFIXES.length]; let nm; do{ nm=pf+k; k++; }while(used.has(nm)); return nm; }
 function globalVars(){ const o=[]; tables.forEach((T,ti)=>(ti===curTab?cols:T.cols).forEach(c=>{ if((c.kind==='data'||c.kind==='formula') && isUsableVarName(c.header)) o.push({name:c.header,ti,c}); })); return o; }
 function formulaTables(expr){
