@@ -701,7 +701,7 @@ window.xlsxReady = loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0
    ════════════════════════════════════════════════ */
 const I18N = {
   uz:{
-    constInLabel:"Özgarmas (nomi = qiymati)", cInPh:"masalan: c = 3", fInLabel:"Yangi ustun (nomi = formula; LaTeX ham bölaveradi)", fExprPh2:"masalan: I_a = U/R yoki F = m*a", addTableBtn:"Yangi jadval qöşiş", tabRename:"Jadval nomi:", delTableConfirm:"Bu jadval öçirilsinmi?", tabTip:"Tanlaş uçun bosing, nomini özgartiriş uçun ikki marta bosing", tableDefault:"Jadval",chartDefault:"Grafik", addChartBtn:"Yangi grafik qöşiş", chTableLabel:"Grafik uçun jadval", delChartBtn:"Grafikni öçiriş",
+    constInLabel:"Özgarmas (nomi = qiymati)", cInPh:"masalan: c = 3", fInLabel:"Yangi ustun (nomi = formula; LaTeX ham bölaveradi)", fExprPh2:"masalan: I_a = U/R yoki F = m*a", addTableBtn:"Yangi jadval qöşiş", tabRename:"Jadval nomi:", delTableConfirm:"Bu jadval öçirilsinmi?", tabTip:"Tanlaş uçun bosing, nomini özgartiriş uçun ikki marta bosing", tableDefault:"Jadval",chartDefault:"Grafik",nameTaken:"Bu nom boşqa ustunda band — barça jadvallarda özgaruvçi nomlari takrorlanmasligi kerak.",pickTableTitle:"Qaysi jadvalga qöşilsin?",pickTableDesc:"Formulada bir neçta jadval özgaruvçilari bor. Yangi ustun qaysi jadvalga qöşilsin?",cancelPick:"Bekor qilış", addChartBtn:"Yangi grafik qöşiş", chTableLabel:"Grafik uçun jadval", delChartBtn:"Grafikni öçiriş",
     appTitle:"Fizika Laboratoriya Jadvali", appSub:"Ölçov natijalarini kiriting, formulalar tuzing, xatolikni hisoblang",
     setupTitle:"Jadvalni sozlaş", setupDesc:"Boşlanğiç qatorlar va ustunlar sonini kiriting. Keyinçalik qator/ustun qöşiş yoki öçiriş mumkin.",
     rowsLabel:"Qatorlar soni", colsLabel:"Ustunlar soni", buildBtn:"Jadval yaratiş", rowShort:"Qator", colShort:"Ustun",
@@ -761,7 +761,7 @@ const I18N = {
     statFormulaTheor:"Δ = |x₀ − x̄|,   ε% = |x₀ − x̄| / |x₀| · 100%"
   },
   ru:{
-    constInLabel:"Константа (имя = значение)", cInPh:"например: c = 3", fInLabel:"Новый столбец (имя = формула; можно LaTeX)", fExprPh2:"например: I_a = U/R или F = m*a", addTableBtn:"Добавить таблицу", tabRename:"Название таблицы:", delTableConfirm:"Удалить эту таблицу?", tabTip:"Нажмите — выбрать, двойной клик — переименовать", tableDefault:"Таблица",chartDefault:"График", addChartBtn:"Добавить график", chTableLabel:"Таблица для графика", delChartBtn:"Удалить график",
+    constInLabel:"Константа (имя = значение)", cInPh:"например: c = 3", fInLabel:"Новый столбец (имя = формула; можно LaTeX)", fExprPh2:"например: I_a = U/R или F = m*a", addTableBtn:"Добавить таблицу", tabRename:"Название таблицы:", delTableConfirm:"Удалить эту таблицу?", tabTip:"Нажмите — выбрать, двойной клик — переименовать", tableDefault:"Таблица",chartDefault:"График",nameTaken:"Это имя уже занято в другом столбце.",pickTableTitle:"В какую таблицу добавить?",pickTableDesc:"В формуле переменные из нескольких таблиц. Куда добавить новый столбец?",cancelPick:"Отмена", addChartBtn:"Добавить график", chTableLabel:"Таблица для графика", delChartBtn:"Удалить график",
     appTitle:"Таблица физической лаборатории", appSub:"Введите результаты измерений, создайте формулы, рассчитайте погрешность",
     setupTitle:"Настройка таблицы", setupDesc:"Введите начальное количество строк и столбцов. Позже можно добавлять или удалять строки/столбцы.",
     rowsLabel:"Количество строк", colsLabel:"Количество столбцов", buildBtn:"Создать таблицу", rowShort:"Строка", colShort:"Столбец",
@@ -822,7 +822,7 @@ const I18N = {
     fNamePh:"например: v", fExprPh:"например: (n1-n2)/t"
   },
   en:{
-    constInLabel:"Constant (name = value)", cInPh:"e.g. c = 3", fInLabel:"New column (name = formula; LaTeX allowed)", fExprPh2:"e.g. I_a = U/R or F = m*a", addTableBtn:"Add table", tabRename:"Table name:", delTableConfirm:"Delete this table?", tabTip:"Click to select, double-click to rename", tableDefault:"Table",chartDefault:"Chart", addChartBtn:"Add chart", chTableLabel:"Table for chart", delChartBtn:"Delete chart",
+    constInLabel:"Constant (name = value)", cInPh:"e.g. c = 3", fInLabel:"New column (name = formula; LaTeX allowed)", fExprPh2:"e.g. I_a = U/R or F = m*a", addTableBtn:"Add table", tabRename:"Table name:", delTableConfirm:"Delete this table?", tabTip:"Click to select, double-click to rename", tableDefault:"Table",chartDefault:"Chart",nameTaken:"This name is already used by another column.",pickTableTitle:"Add to which table?",pickTableDesc:"The formula uses variables from several tables. Which table gets the new column?",cancelPick:"Cancel", addChartBtn:"Add chart", chTableLabel:"Table for chart", delChartBtn:"Delete chart",
     appTitle:"Physics Lab Table", appSub:"Enter measurement results, build formulas, calculate error",
     setupTitle:"Table setup", setupDesc:"Enter the initial number of rows and columns. You can add or remove rows/columns later.",
     rowsLabel:"Number of rows", colsLabel:"Number of columns", buildBtn:"Build table", rowShort:"Row", colShort:"Column",
@@ -1427,27 +1427,58 @@ function bindPreview(inpId, prevId){
 }
 
 /* ═══ JADVALLAR (ustunlar va kattalik nomlari hammasi uçun umumiy, qatorlar/qiymatlar har jadvalda alohida) ═══ */
-let tables=[{id:'t1',name:'',rowCount:0,cellData:{},rowNames:[],hasRowNames:false}], curTab=0, tabSeq=1;
-function saveTab(){ const T=tables[curTab]; T.rowCount=rowCount; T.cellData=cellData; T.rowNames=rowNames; T.hasRowNames=hasRowNames; }
+let tables=[{id:'t1',name:'',rowCount:0,cellData:{},rowNames:[],hasRowNames:false,cols:[]}], curTab=0, tabSeq=1;
+function saveTab(){ const T=tables[curTab]; T.cols=cols; T.rowCount=rowCount; T.cellData=cellData; T.rowNames=rowNames; T.hasRowNames=hasRowNames; }
 function loadTab(i){
   curTab=i; const T=tables[i];
-  rowCount=T.rowCount; cellData=T.cellData; hasRowNames=T.hasRowNames;
+  cols=T.cols; rowCount=T.rowCount; cellData=T.cellData; hasRowNames=T.hasRowNames;
   rowNames=T.rowNames=Array.from({length:rowCount},(_,k)=>T.rowNames[k]||'');
-  formulaCache={}; errorCache={}; rowAvgCache={};
   cols.forEach(c=>{ if(c.kind==='data'){ if(!cellData[c.id]) cellData[c.id]=[]; while(cellData[c.id].length<rowCount) cellData[c.id].push(''); } });
 }
 function tabName(i){ return tables[i].name || (t('tableDefault')+' '+(i+1)); }
 function switchTab(i){ if(i===curTab) return; saveTab(); loadTab(i); render(); }
 function addTable(){
-  saveTab(); const n=Math.max(1,parseInt(document.getElementById('initRows').value)||5);
-  tables.push({id:'t'+(++tabSeq),name:'',rowCount:n,cellData:{},rowNames:new Array(n).fill(''),hasRowNames:false});
-  loadTab(tables.length-1); render();
+  saveTab(); const n=Math.max(1,parseInt(document.getElementById('initRows').value)||5), nc=Math.max(1,parseInt(document.getElementById('initCols').value)||3);
+  const nt={id:'t'+(++tabSeq),name:'',rowCount:n,cellData:{},rowNames:new Array(n).fill(''),hasRowNames:false,cols:[]};
+  tables.push(nt); const ti=tables.length-1;
+  for(let k=1;k<=nc;k++){ const id=makeColId(); nt.cols.push({id,header:autoName(ti,k),kind:'data'}); nt.cellData[id]=new Array(n).fill(''); }
+  loadTab(ti); render();
+}
+const PREFIXES=['n','m','p','q','r','s','u','v','w','k','l','g'];
+function allCols(){ const o=[]; tables.forEach((T,i)=>(i===curTab?cols:T.cols).forEach(c=>o.push(c))); return o; }
+function findCol(id){ return findCol(id)||allCols().find(c=>c.id===id); }
+function autoName(ti,k){ const used=new Set(allCols().map(c=>c.header)); const pf=PREFIXES[ti%PREFIXES.length]; let nm; do{ nm=pf+k; k++; }while(used.has(nm)); return nm; }
+function globalVars(){ const o=[]; tables.forEach((T,ti)=>(ti===curTab?cols:T.cols).forEach(c=>{ if((c.kind==='data'||c.kind==='formula') && isUsableVarName(c.header)) o.push({name:c.header,ti,c}); })); return o; }
+function formulaTables(expr){
+  const gv=globalVars(), names=gv.map(x=>x.name).concat(Object.keys(constVals)), by={}; gv.forEach(x=>by[x.name]=x.ti);
+  const set=new Set();
+  tokenize(expr,names).forEach(tk=>{ if(tk.t!=='id') return; const key=tk.idx?tk.idx.name:tk.v;
+    if(key in by) set.add(by[key]); else { const parts=splitKnown(tk.v,names); if(parts) parts.forEach(k=>{ if(k in by) set.add(by[k]); }); } });
+  return [...set].sort((a,b)=>a-b);
+}
+function extVal(T,c,r){
+  if(r>=T.rowCount) return NaN;
+  if(c.kind==='data'){ const raw=(T.cellData[c.id]||[])[r]; if(raw===undefined||raw==='') return NaN; const e=c.exp||0; if(!e) return parseFloat(raw); return /^[+-]?(\d+\.?\d*|\.\d+)$/.test(raw)?parseFloat(raw+'e'+e):parseFloat(raw)*Number('1e'+e); }
+  const a=formulaCache[c.id]; return a&&a[r]!==undefined?a[r]:NaN;
+}
+function recomputeEverything(){
+  saveTab(); const cur=curTab;
+  for(let pass=0;pass<3;pass++) for(let i=0;i<tables.length;i++){ loadTab(i); recomputeConsts(); recomputeFormulas(); }
+  loadTab(cur); recomputeConsts(); recomputeFormulas();
+}
+function chooseTable(tis,cb){
+  const ov=document.createElement('div'); ov.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:999;display:flex;align-items:center;justify-content:center';
+  const bx=document.createElement('div'); bx.style.cssText='background:#fff;border-radius:14px;padding:20px;max-width:420px;width:90%';
+  bx.innerHTML='<h3 style="margin-bottom:6px">'+escH(t('pickTableTitle'))+'</h3><div style="color:var(--sub);font-size:13px;margin-bottom:12px">'+escH(t('pickTableDesc'))+'</div>';
+  tis.forEach(i=>{ const b=document.createElement('button'); b.className='btn btn-primary'; b.style.cssText='margin:4px 0;width:100%'; b.textContent=tabName(i); b.onclick=()=>{ ov.remove(); cb(i); }; bx.appendChild(b); });
+  const c=document.createElement('button'); c.className='btn btn-ghost btn-sm'; c.textContent=t('cancelPick'); c.onclick=()=>ov.remove(); bx.appendChild(c);
+  ov.appendChild(bx); document.body.appendChild(ov);
 }
 function removeTab(i){
   if(tables.length<2 || !confirm(t('delTableConfirm'))) return;
   saveTab(); tables.splice(i,1); loadTab(Math.min(i,tables.length-1)); render();
 }
-function recomputeAll(){ recomputeConsts(); recomputeFormulas(); recomputeConsts(); recomputeFormulas(); recomputeErrorColumns(); recomputeRowAvg(); }
+function recomputeAll(){ recomputeEverything(); recomputeErrorColumns(); recomputeRowAvg(); }
 function withTab(tid, fn){
   const idx=tables.findIndex(x=>x.id===tid);
   if(idx<0 || idx===curTab) return fn();
@@ -1499,7 +1530,7 @@ function addChart(){
   const ch={root, s:newChartState(), name:''}; charts.push(ch);
   ['pointerdown','focusin','change','input','click','keydown','mousemove','touchstart'].forEach(ev=>root.addEventListener(ev,()=>activate(ch),true));
   activate(ch);
-  CHBIND.forEach(f=>f()); initChartExtras(); attachGreek(CQ('customFitFormula'));
+  CHBIND.forEach(f=>f()); initChartExtras(); CQ('chTable').addEventListener('change',()=>renderColSelects()); attachGreek(CQ('customFitFormula'));
   root.querySelectorAll('.sw input').forEach(i=>i.addEventListener('change',syncSwitches));
   CQ('btnDelChart').addEventListener('click',()=>{
     if(charts.length<2) return;
@@ -1513,13 +1544,14 @@ function addChart(){
 function makeColId(){ return 'c'+(++colSeq); }
 
 function buildTable(nRows, nCols){
+  tables=[{id:'t'+(++tabSeq),name:'',rowCount:0,cellData:{},rowNames:[],hasRowNames:false,cols:[]}]; curTab=0;
   cols=[]; cellData={}; rowCount=nRows; colSeq=0; formulaCache={}; errorCache={}; rowAvgCache={}; rowNames=new Array(nRows).fill(''); hasRowNames=false;
   for(let i=1;i<=nCols;i++){
     const id=makeColId();
-    cols.push({id, header:'n'+i, kind:'data'});
+    cols.push({id, header:autoName(0,i), kind:'data'});
     cellData[id]=new Array(nRows).fill('');
   }
-  tables=[{id:'t'+(++tabSeq),name:'',rowCount,cellData,rowNames,hasRowNames}]; curTab=0;
+  tables=[{id:'t'+(++tabSeq),name:'',rowCount,cellData,rowNames,hasRowNames,cols}]; curTab=0;
   render();
 }
 function addRow(){
@@ -1540,7 +1572,7 @@ function addColumn(){
   if(rowCount===0){ showMsg('tableMsg',t('needBuildFirst'),false); return; }
   const dataColCount=cols.filter(c=>c.kind==='data').length;
   const id=makeColId();
-  cols.push({id, header:'n'+(dataColCount+1), kind:'data'});
+  cols.push({id, header:autoName(curTab,dataColCount+1), kind:'data'});
   cellData[id]=new Array(rowCount).fill('');
   render();
 }
@@ -1563,7 +1595,7 @@ function removeRowNameColumn(){
   render();
 }
 function removeColumn(id){
-  const col=cols.find(c=>c.id===id);
+  const col=findCol(id);
   if(!col) return;
   let toRemove=[id];
   if(col.kind==='formula'){
@@ -1602,6 +1634,7 @@ function renameVarInFormula(formula, map, names){
 function renameColumn(c, rawName){
   const nv=latexToGreek(texToPlain(String(rawName).trim()));
   if(!nv || nv===c.header){ render(); return; }
+  if((c.kind==='data'||c.kind==='formula') && allCols().some(x=>x!==c && (x.kind==='data'||x.kind==='formula') && x.header===nv)){ showMsg('tableMsg',t('nameTaken'),false); render(); return; }
   const oldMap=getVarNamesMap();
   const oldHeader=c.header;
   c.header=nv;
@@ -1609,8 +1642,8 @@ function renameColumn(c, rawName){
   const map={}; let any=false;
   Object.keys(oldMap).forEach(id=>{ if(newMap[id] && oldMap[id]!==newMap[id]){ map[oldMap[id]]=newMap[id]; any=true; } });
   if(any){
-    const names=Object.values(oldMap).concat(Object.keys(constVals));
-    cols.forEach(fc=>{ if(fc.kind==='formula') fc.formula=renameVarInFormula(fc.formula, map, names); });
+    const names=Object.values(oldMap).concat(Object.keys(constVals)).concat(allCols().map(x=>x.header));
+    allCols().forEach(fc=>{ if(fc.kind==='formula') fc.formula=renameVarInFormula(fc.formula, map, names); });
     consts.forEach(k=>{ if(k.fromFormula) k.expr=renameVarInFormula(k.expr, map, names); });
   }
   if(c.kind==='formula'){
@@ -1629,6 +1662,7 @@ function recomputeFormulas(){
   const baseCols=cols.filter(c=>c.kind==='data'||c.kind==='formula');
   const formulaCols=cols.filter(c=>c.kind==='formula');
   formulaCols.forEach(fc=>{ if(!formulaCache[fc.id]) formulaCache[fc.id]=new Array(rowCount).fill(NaN); });
+  const ext=[]; tables.forEach((TT,ti)=>{ if(ti===curTab) return; TT.cols.forEach(c=>{ if((c.kind==='data'||c.kind==='formula') && isUsableVarName(c.header)) ext.push([c.header,TT,c]); }); });
   const passes=formulaCols.length+1;
   for(let pass=0; pass<passes; pass++){
     formulaCols.forEach(fc=>{
@@ -1642,6 +1676,7 @@ function recomputeFormulas(){
           else v = (formulaCache[c.id] && formulaCache[c.id][r]!==undefined) ? formulaCache[c.id][r] : NaN;
           vars[varMap[c.id]] = v;
         });
+        ext.forEach(([nm,TT,c])=>{ if(!(nm in vars)) vars[nm]=extVal(TT,c,r); });
         try{ vals[r]=evalFormula(fc.formula, vars); }
         catch(e){ vals[r]=NaN; }
       }
@@ -1688,7 +1723,7 @@ function valueAt(c, r){
   return NaN;
 }
 function colValues(id){
-  const c=cols.find(x=>x.id===id);
+  const c=findCol(id);
   if(!c) return [];
   const arr=[];
   for(let r=0;r<rowCount;r++) arr.push(valueAt(c,r));
@@ -1729,10 +1764,7 @@ function render(){
       } else if(_lastPointerCell && Date.now()-_lastPointerCell.t<400){
         restore={colid:_lastPointerCell.colid, row:_lastPointerCell.row};
       }
-      recomputeConsts();
-      recomputeFormulas();
-      recomputeConsts();      // indeksli özgarmaslar formula ustunlariga tayanişi mumkin
-      recomputeFormulas();
+      recomputeEverything();
       recomputeErrorColumns();
       recomputeRowAvg();
       renderTable(); renderTabs();
@@ -2100,12 +2132,13 @@ function renderFormulaList(){
 function renderColSelects(){
   const _a=ACT; charts.forEach(ch=>{ activate(ch);
     const xs=CQ('xCol'), ys=CQ('yCol'), ts=CQ('chTable'); const prevX=xs.value, prevY=ys.value, prevT=ts.value;
-    xs.innerHTML=''; ys.innerHTML=''; ts.innerHTML='';
-    cols.forEach(c=>{ [xs,ys].forEach(s=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.header; s.appendChild(o); }); });
-    if(cols.some(c=>c.id===prevX)) xs.value=prevX;
-    if(cols.some(c=>c.id===prevY)) ys.value=prevY; else if(cols.length>1) ys.value=cols[1].id;
-    tables.forEach((tb,i)=>{ const o=document.createElement('option'); o.value=tb.id; o.textContent=tabName(i); ts.appendChild(o); });
+    ts.innerHTML=''; tables.forEach((tb,i)=>{ const o=document.createElement('option'); o.value=tb.id; o.textContent=tabName(i); ts.appendChild(o); });
     ts.value = tables.some(x=>x.id===prevT) ? prevT : tables[curTab].id;
+    const tb=tables.find(x=>x.id===ts.value)||tables[curTab], tc=(tb===tables[curTab])?cols:tb.cols;
+    xs.innerHTML=''; ys.innerHTML='';
+    tc.forEach(c=>{ [xs,ys].forEach(s=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.header; s.appendChild(o); }); });
+    if(tc.some(c=>c.id===prevX)) xs.value=prevX;
+    if(tc.some(c=>c.id===prevY)) ys.value=prevY; else if(tc.length>1) ys.value=tc[1].id;
   }); if(_a) activate(_a);
 
   // statCol — faqat sonli qiymat beradigan ustunlar (data, formula, qator o'rtachasi)
@@ -2133,7 +2166,7 @@ function rmsError(vals, mean){
 }
 
 function computeColumnStats(colId){
-  const col = cols.find(c=>c.id===colId);
+  const col = findCol(colId);
   if(!col) return null;
   const vals = colValues(colId).filter(v=>v!==null && v!==undefined && !isNaN(v));
   if(!vals.length) return {n:0};
@@ -2188,7 +2221,7 @@ function formulaIsConstOnly(expr){
 function addConstFromFormula(name, expr){
   if(!validIdentifier(name)){ showMsg('formulaMsg',t('constBadName'),false); return false; }
   const varMap=getVarNamesMap();
-  const usedByCol=cols.some(c=>(c.kind==='data'||c.kind==='formula') && varMap[c.id]===name);
+  const usedByCol=allCols().some(c=>(c.kind==='data'||c.kind==='formula') && c.header===name);
   if(CUSTOM_FIT_FUNCS.includes(name.toLowerCase()) || usedByCol || consts.some(k=>k.name===name)){ showMsg('formulaMsg',t('constTaken'),false); return false; }
   buildIdxCtx();
   let v;
@@ -2205,29 +2238,35 @@ function addConstFromFormula(name, expr){
 document.getElementById('btnAddFormula').addEventListener('click',()=>{
   const _sp=splitEq(document.getElementById('fExpr').value); const name=latexToGreek(texToPlain(_sp[0])); const expr=latexToGreek(texToPlain(_sp[1]));
   if(!name||!expr){ showMsg('formulaMsg',t('needName'),false); return; }
-  if(rowCount===0){ showMsg('formulaMsg',t('needBuildFirst'),false); return; }
+  if(!allCols().length){ showMsg('formulaMsg',t('needBuildFirst'),false); return; }
   if(consts.some(k=>k.name===name)){ showMsg('formulaMsg',t('constTaken'),false); return; }
+  if(allCols().some(c=>(c.kind==='data'||c.kind==='formula') && c.header===name)){ showMsg('formulaMsg',t('nameTaken'),false); return; }
+  let tis;
   try{
-    const varMap=getVarNamesMap();
     const testVars=Object.assign({},constVals);
-    cols.filter(c=>c.kind==='data'||c.kind==='formula').forEach(c=>{ testVars[varMap[c.id]]=1; });
+    globalVars().forEach(x=>{ testVars[x.name]=1; });
     evalFormula(expr, testVars);
+    tis=formulaTables(expr);
   }catch(e){
     showMsg('formulaMsg', t('formulaErr')+' '+e.message, false); return;
   }
   if(formulaIsConstOnly(expr)){ addConstFromFormula(name, expr); return; }
-  const fid=makeColId();
-  cols.push({id:fid, header:name, kind:'formula', formula:expr});
-  if(document.getElementById('swErrors').checked){
-    const aid=makeColId();
-    cols.push({id:aid, header:'Δ'+name, kind:'abserr', parent:fid});
-    const relid=makeColId();
-    cols.push({id:relid, header:'ε('+name+')%', kind:'relerr', parent:fid});
-  }
-  document.getElementById('fName').value='';
-  document.getElementById('fExpr').value='';
-  render();
-  showMsg('formulaMsg', t('formulaAdded')+' '+name, true);
+  const finish=ti=>{
+    saveTab(); if(ti!==curTab) loadTab(ti);
+    const fid=makeColId();
+    cols.push({id:fid, header:name, kind:'formula', formula:expr});
+    if(document.getElementById('swErrors').checked){
+      const aid=makeColId();
+      cols.push({id:aid, header:'Δ'+name, kind:'abserr', parent:fid});
+      const relid=makeColId();
+      cols.push({id:relid, header:'ε('+name+')%', kind:'relerr', parent:fid});
+    }
+    document.getElementById('fName').value='';
+    document.getElementById('fExpr').value='';
+    render();
+    showMsg('formulaMsg', t('formulaAdded')+' '+name+' → '+tabName(ti), true);
+  };
+  if(tis.length>1) chooseTable(tis, finish); else finish(tis.length?tis[0]:curTab);
 });
 
 document.getElementById('btnCalcStat').addEventListener('click',()=>{
@@ -2276,7 +2315,7 @@ document.getElementById('btnCalcStat').addEventListener('click',()=>{
 
 document.getElementById('btnReset').addEventListener('click',()=>{
   if(!confirm(t('resetConfirm'))) return;
-  cols=[]; cellData={}; rowCount=0; formulaCache={}; errorCache={}; rowAvgCache={}; rowNames=[]; hasRowNames=false; lastStat=null; tables=[{id:'t'+(++tabSeq),name:'',rowCount:0,cellData,rowNames,hasRowNames:false}]; curTab=0;
+  cols=[]; cellData={}; rowCount=0; formulaCache={}; errorCache={}; rowAvgCache={}; rowNames=[]; hasRowNames=false; lastStat=null; tables=[{id:'t'+(++tabSeq),name:'',rowCount:0,cellData,rowNames,hasRowNames:false,cols}]; curTab=0;
   document.getElementById('theorVal').value=''; document.getElementById('theorExp').value='';
   const statBox=document.getElementById('statResult');
   statBox.classList.remove('show'); statBox.innerHTML='';
@@ -2921,7 +2960,7 @@ CHBIND.push(()=>CQ('btnPlot').addEventListener('click',()=>{
   setChartMsg(fitErr ? (t('fitFailedNote')+' '+fitErr.message) : '', 'err');
   if(lastFit && lastFit.xid!==xid) chartUI.xOv=null;
   if(lastFit && lastFit.yid!==yid) chartUI.yOv=null;
-  lastFit={xs,ys,fit,fitType,customFormula,fitFailed:!!fitErr,xid,yid,xLabel:axisLabel(cols.find(c=>c.id===xid)),yLabel:axisLabel(cols.find(c=>c.id===yid))};
+  lastFit={xs,ys,fit,fitType,customFormula,fitFailed:!!fitErr,xid,yid,xLabel:axisLabel(findCol(xid)),yLabel:axisLabel(findCol(yid))};
   refreshChartUI();
   CQ('btnSaveImg').style.display='inline-flex';
 }));
@@ -2943,7 +2982,7 @@ function shortFitName(type){
 function drawChart(){
   if(!lastFit) return;
   const {xs,ys,fit}=lastFit;
-  const cxo=cols.find(c=>c.id===lastFit.xid), cyo=cols.find(c=>c.id===lastFit.yid);
+  const cxo=findCol(lastFit.xid), cyo=findCol(lastFit.yid);
   const xLabel=cxo?axisLabel(cxo):lastFit.xLabel, yLabel=cyo?axisLabel(cyo):lastFit.yLabel;
   refreshLegendPlaceholders(fit);
   const showFit = !!fit && CQ('swBestFit').checked;
@@ -3323,7 +3362,7 @@ function addConstant(){
   if(!validIdentifier(name)){ showMsg('constMsg',t('constBadName'),false); return; }
   const reserved=CUSTOM_FIT_FUNCS.includes(name.toLowerCase());
   const varMap=getVarNamesMap();
-  const usedByCol=cols.some(c=>(c.kind==='data'||c.kind==='formula') && varMap[c.id]===name);
+  const usedByCol=allCols().some(c=>(c.kind==='data'||c.kind==='formula') && c.header===name);
   if(reserved || usedByCol || consts.some(k=>k.name===name)){ showMsg('constMsg',t('constTaken'),false); return; }
   const expEl=document.getElementById('cExp');
   const expTxt=expEl.value.trim().replace(/[−–—]/g,'-').replace(/^\+/,'');
@@ -3422,7 +3461,7 @@ function isUnitEditable(c){ return !!c && (c.kind==='data'||c.kind==='formula'||
 function colUnit(c){
   if(!c) return '';
   if(c.kind==='relerr') return '%';
-  if(c.kind==='abserr'){ const p=cols.find(x=>x.id===c.parent); return p ? (p.unit||'') : ''; }
+  if(c.kind==='abserr'){ const p=findCol(c.parent); return p ? (p.unit||'') : ''; }
   return c.unit||'';
 }
 function axisLabel(c){
@@ -3435,13 +3474,13 @@ function syncUnitInputs(){
   [['xCol','xUnit'],['yCol','yUnit']].forEach(([sid,uid])=>{
     const sel=document.getElementById(sid), inp=document.getElementById(uid);
     if(!sel||!inp) return;
-    const c=cols.find(x=>x.id===sel.value);
+    const c=findCol(sel.value);
     const val=c ? colUnit(c) : '';
     if(document.activeElement!==inp && inp.value!==val) inp.value=val;
     inp.disabled=!isUnitEditable(c);
   });
   document.querySelectorAll('input.hunit-in').forEach(inp=>{
-    const c=cols.find(x=>x.id===inp.dataset.unitfor);
+    const c=findCol(inp.dataset.unitfor);
     if(c && document.activeElement!==inp && inp.value!==(c.unit||'')) inp.value=c.unit||'';
   });
 }
@@ -3696,7 +3735,7 @@ function openChartEditor(kind, row){
   const cv=CQ('fitCanvas'), stage=CQ('chartStage');
   const r=cv.getBoundingClientRect(), k=r.width/640;
   let region, initial, fontPx, bold=false, rotate=false, align='center', commit;
-  const cxo=cols.find(c=>c.id===lastFit.xid), cyo=cols.find(c=>c.id===lastFit.yid);
+  const cxo=findCol(lastFit.xid), cyo=findCol(lastFit.yid);
   if(kind==='title'){
     region=chartUI.regions.title || {x:220,y:16,w:200,h:28};
     initial=chartUI.title; fontPx=17; bold=true;
