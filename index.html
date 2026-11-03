@@ -3280,7 +3280,7 @@ document.getElementById('btnExportExcel').addEventListener('click', async ()=>{
     tables.forEach((TT,i)=>{ let sn=(tabName(i).replace(/[\\\/?*\[\]:]/g,'_').slice(0,28))||('T'+(i+1)); while(_sn.has(sn)) sn+='_'; _sn.add(sn);
       XLSX.utils.book_append_sheet(wb, withTab(TT.id, buildSheet), sn); });
     saveTab();
-    const _meta=JSON.stringify({v:1,tabSeq,colSeq,constSeq,consts:consts.map(k=>({id:k.id,name:k.name,expr:k.expr,exp:k.exp,fromFormula:k.fromFormula})),
+    const _meta=JSON.stringify({v:1,tabSeq,colSeq,constSeq,lastStat,consts:consts.map(k=>({id:k.id,name:k.name,expr:k.expr,exp:k.exp,fromFormula:k.fromFormula})),
       tables:tables.map(TT=>({id:TT.id,name:TT.name,rowCount:TT.rowCount,rowNames:TT.rowNames,hasRowNames:TT.hasRowNames,cols:TT.cols,cellData:TT.cellData}))});
     const _rows=[]; for(let i=0;i<_meta.length;i+=30000) _rows.push([_meta.slice(i,i+30000)]);
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(_rows), '_dastur_meta');
@@ -4420,13 +4420,27 @@ async function importExcel(file){
       });
       tables=st.tables; tabSeq=st.tabSeq; colSeq=st.colSeq; constSeq=st.constSeq; consts=st.consts;
     } else {
-      tables=[]; consts=[]; colSeq=0; tabSeq=0; cols=[];
+      tables=[]; consts=[]; colSeq=0; tabSeq=0; constSeq=0; cols=[]; const pendC=[];
       wb.SheetNames.forEach(sn=>{
         const rows=sheetRows(sn); if(!rows.length) return;
         const hdr=rows[0]; let c0=0, nameCol=-1;
         if(String(hdr[0]).trim()===t('trHeader')) c0=1;
         if(String(hdr[c0]).trim()===t('rowNameHeader')){ nameCol=c0; c0++; }
         const body=[]; for(let r=1;r<rows.length;r++){ const row=rows[r]; if(row.every(x=>x==='')||String(row[0]).trim()===t('meanRow')) break; body.push(row); }
+        const fm={}, cLabels=Object.keys(I18N).map(l=>(I18N[l].constTitle||'')+':');
+        const textOf=row=>row.slice(1).find(x=>typeof x==='string'&&x.trim()!=='');
+        for(let r=body.length+1;r<rows.length;r++){
+          const a=String(rows[r][0]).trim(); const isF=(a==='Formulalar:'), isC=cLabels.includes(a);
+          if(!isF && !isC) continue;
+          for(let q=r+1;q<rows.length;q++){
+            const row=rows[q]; if(row.every(x=>x==='')) break;
+            const nm=String(row[0]).trim(); if(!nm) continue;
+            if(isF){ const f=textOf(row); if(f) fm[nm]=f.trim(); }
+            else { const ex=textOf(row), num=row.slice(1).find(x=>typeof x==='number'); let expr=ex!==undefined?ex.trim():(num!==undefined?String(num):''), e2=0;
+              const mm=/^(.*?)\s*×10\^(-?\d+)$/.exec(expr); if(mm){ expr=mm[1]; e2=parseInt(mm[2],10); }
+              if(expr && !pendC.some(k=>k.name===nm)) pendC.push({name:nm,expr,exp:e2}); }
+          }
+        }
         const TT={id:'t'+(++tabSeq),name:sn,rowCount:Math.max(1,body.length),cellData:{},rowNames:[],hasRowNames:nameCol>=0,cols:[]};
         tables.push(TT); const ti=tables.length-1;
         TT.rowNames=Array.from({length:TT.rowCount},(_,r)=>nameCol>=0&&body[r]?String(body[r][nameCol]):'');
@@ -4435,17 +4449,31 @@ async function importExcel(file){
           let name=h, exp=0, unit='';
           let m=/^(.*?)\s*\(×10\^(-?\d+)\)$/.exec(name); if(m){ name=m[1]; exp=parseInt(m[2],10); }
           m=/^(.*?)\s*\(([^()]*)\)$/.exec(name); if(m && m[1]){ name=m[1]; unit=m[2]; }
-          const vals=body.map(r=>r[j]); if(vals.every(v=>typeof v!=='number'&&v==='')) continue;
-          if(allColsOf().some(c=>c.header===name)) name=autoNameOf(ti,1);
-          const id=makeColId(); const col={id,header:name,kind:'data'}; if(exp) col.exp=exp; if(unit) col.unit=unit;
+          const vals=body.map(r=>r[j]);
+          let kind='data', extra={}, mm;
+          if(fm[name]){ kind='formula'; extra={formula:fm[name]}; }
+          else if((mm=/^Δ(.+)$/.exec(name)) && TT.cols.some(c=>c.kind==='formula'&&c.header===mm[1])){ kind='abserr'; extra={parent:TT.cols.find(c=>c.kind==='formula'&&c.header===mm[1]).id}; }
+          else if((mm=/^ε\((.+)\)%$/.exec(name)) && TT.cols.some(c=>c.kind==='formula'&&c.header===mm[1])){ kind='relerr'; extra={parent:TT.cols.find(c=>c.kind==='formula'&&c.header===mm[1]).id}; }
+          else if(name===t('rowAvgHeader')){ kind='rowavg'; }
+          else if(vals.every(v=>typeof v!=='number'&&v==='')) continue;
+          if(kind==='data' && allColsOf().some(c=>c.header===name)) name=autoNameOf(ti,1);
+          const id=makeColId(); const col=Object.assign({id,header:name,kind},extra); if(exp&&kind==='data') col.exp=exp; if(unit) col.unit=unit;
           TT.cols.push(col);
-          TT.cellData[id]=Array.from({length:TT.rowCount},(_,r)=>{ const v=vals[r]; return typeof v==='number'?String(+(v/Math.pow(10,exp)).toPrecision(12)):''; });
+          if(kind==='data') TT.cellData[id]=Array.from({length:TT.rowCount},(_,r)=>{ const v=vals[r]; return typeof v==='number'?String(+(v/Math.pow(10,exp)).toPrecision(12)):''; });
         }
       });
       if(!tables.length) throw new Error('empty');
+      pendC.forEach(k=>{ if(!allColsOf().some(c=>c.header===k.name)){ const o={id:'k'+(++constSeq),name:k.name,expr:k.expr}; if(k.exp) o.exp=k.exp; consts.push(o); } });
     }
     lastStat=null; formulaCache={}; errorCache={}; rowAvgCache={}; curTab=0; loadTab(0); render();
-    showMsg('excelMsg', t('importOk')+(ms?'':' (formulalarsiz)'), true);
+    const _ls=ms && JSON.parse(XLSX.utils.sheet_to_json(ms,{header:1}).map(r=>r[0]||'').join('')).lastStat;
+    if(_ls && findCol(_ls.colId)){
+      const ti=tables.findIndex(TT=>TT.cols.some(c=>c.id===_ls.colId)); if(ti>=0 && ti!==curTab){ saveTab(); loadTab(ti); render(); }
+      document.getElementById('statCol').value=_ls.colId;
+      document.getElementById('theorVal').value=(_ls.theor===null||_ls.theor===undefined)?'':String(_ls.theor); document.getElementById('theorExp').value='';
+      document.getElementById('btnCalcStat').click();
+    }
+    showMsg('excelMsg', t('importOk'), true);
   }catch(e){ console.error(e); showMsg('excelMsg', t('importFail')+': '+e.message, false); }
 }
 function allColsOf(){ const o=[]; tables.forEach(T=>T.cols.forEach(c=>o.push(c))); return o; }
