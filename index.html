@@ -426,7 +426,7 @@ table.lab thead th .hunit input.hunit-in:not(:placeholder-shown){border-style:so
 .hname-box .hname{display:none}.hname-box.edit .hname{display:block}.hname-box.edit .hview{display:none}
 .fpreview{min-height:34px;margin:8px 0;padding:8px 12px;background:var(--violet-bg);border-radius:10px;font-size:17px;overflow-x:auto}
 .fpreview:empty{display:none}
-#chartsHost{counter-reset:chn}.chart-card h2::after{counter-increment:chn;content:" #" counter(chn);color:var(--sub);font-weight:600}
+
 .chart-card{margin-bottom:18px}
 </style>
 </head>
@@ -561,8 +561,8 @@ table.lab thead th .hunit input.hunit-in:not(:placeholder-shown){border-style:so
       </section>
 
       <!-- GRAFIK -->
+      <div class="tabbar" id="chartTabBar"></div>
       <div id="chartsHost"></div>
-      <div class="card" style="text-align:center"><button class="btn btn-primary" style="width:auto" id="btnAddChart">➕ <span data-i="addChartBtn">Yangi grafik qöşiş</span></button></div>
       <template id="chartTpl"><section class="card chart-card">
         <h2>📈 <span data-i="chartTitle">Boğlaniş grafigi va eng mos çiziq (best fit)</span></h2>
         <div class="row2" style="align-items:flex-end"><label class="f"><span data-i="chTableLabel">Grafik uçun jadval</span><select id="chTable"></select></label><button type="button" class="btn btn-ghost btn-sm" id="btnDelChart" style="flex:0 0 auto">✕ <span data-i="delChartBtn">Grafikni öçiriş</span></button></div>
@@ -701,7 +701,7 @@ window.xlsxReady = loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0
    ════════════════════════════════════════════════ */
 const I18N = {
   uz:{
-    constInLabel:"Özgarmas (nomi = qiymati)", cInPh:"masalan: c = 3", fInLabel:"Yangi ustun (nomi = formula; LaTeX ham bölaveradi)", fExprPh2:"masalan: I_a = U/R yoki F = m*a", addTableBtn:"Yangi jadval qöşiş", tabRename:"Jadval nomi:", delTableConfirm:"Bu jadval öçirilsinmi?", tabTip:"Tanlaş uçun bosing, nomini özgartiriş uçun ikki marta bosing", tableDefault:"Jadval", addChartBtn:"Yangi grafik qöşiş", chTableLabel:"Grafik uçun jadval", delChartBtn:"Grafikni öçiriş",
+    constInLabel:"Özgarmas (nomi = qiymati)", cInPh:"masalan: c = 3", fInLabel:"Yangi ustun (nomi = formula; LaTeX ham bölaveradi)", fExprPh2:"masalan: I_a = U/R yoki F = m*a", addTableBtn:"Yangi jadval qöşiş", tabRename:"Jadval nomi:", delTableConfirm:"Bu jadval öçirilsinmi?", tabTip:"Tanlaş uçun bosing, nomini özgartiriş uçun ikki marta bosing", tableDefault:"Jadval",chartDefault:"Grafik", addChartBtn:"Yangi grafik qöşiş", chTableLabel:"Grafik uçun jadval", delChartBtn:"Grafikni öçiriş",
     appTitle:"Fizika Laboratoriya Jadvali", appSub:"Ölçov natijalarini kiriting, formulalar tuzing, xatolikni hisoblang",
     setupTitle:"Jadvalni sozlaş", setupDesc:"Boşlanğiç qatorlar va ustunlar sonini kiriting. Keyinçalik qator/ustun qöşiş yoki öçiriş mumkin.",
     rowsLabel:"Qatorlar soni", colsLabel:"Ustunlar soni", buildBtn:"Jadval yaratiş", rowShort:"Qator", colShort:"Ustun",
@@ -761,7 +761,7 @@ const I18N = {
     statFormulaTheor:"Δ = |x₀ − x̄|,   ε% = |x₀ − x̄| / |x₀| · 100%"
   },
   ru:{
-    constInLabel:"Константа (имя = значение)", cInPh:"например: c = 3", fInLabel:"Новый столбец (имя = формула; можно LaTeX)", fExprPh2:"например: I_a = U/R или F = m*a", addTableBtn:"Добавить таблицу", tabRename:"Название таблицы:", delTableConfirm:"Удалить эту таблицу?", tabTip:"Нажмите — выбрать, двойной клик — переименовать", tableDefault:"Таблица", addChartBtn:"Добавить график", chTableLabel:"Таблица для графика", delChartBtn:"Удалить график",
+    constInLabel:"Константа (имя = значение)", cInPh:"например: c = 3", fInLabel:"Новый столбец (имя = формула; можно LaTeX)", fExprPh2:"например: I_a = U/R или F = m*a", addTableBtn:"Добавить таблицу", tabRename:"Название таблицы:", delTableConfirm:"Удалить эту таблицу?", tabTip:"Нажмите — выбрать, двойной клик — переименовать", tableDefault:"Таблица",chartDefault:"График", addChartBtn:"Добавить график", chTableLabel:"Таблица для графика", delChartBtn:"Удалить график",
     appTitle:"Таблица физической лаборатории", appSub:"Введите результаты измерений, создайте формулы, рассчитайте погрешность",
     setupTitle:"Настройка таблицы", setupDesc:"Введите начальное количество строк и столбцов. Позже можно добавлять или удалять строки/столбцы.",
     rowsLabel:"Количество строк", colsLabel:"Количество столбцов", buildBtn:"Создать таблицу", rowShort:"Строка", colShort:"Столбец",
@@ -822,7 +822,7 @@ const I18N = {
     fNamePh:"например: v", fExprPh:"например: (n1-n2)/t"
   },
   en:{
-    constInLabel:"Constant (name = value)", cInPh:"e.g. c = 3", fInLabel:"New column (name = formula; LaTeX allowed)", fExprPh2:"e.g. I_a = U/R or F = m*a", addTableBtn:"Add table", tabRename:"Table name:", delTableConfirm:"Delete this table?", tabTip:"Click to select, double-click to rename", tableDefault:"Table", addChartBtn:"Add chart", chTableLabel:"Table for chart", delChartBtn:"Delete chart",
+    constInLabel:"Constant (name = value)", cInPh:"e.g. c = 3", fInLabel:"New column (name = formula; LaTeX allowed)", fExprPh2:"e.g. I_a = U/R or F = m*a", addTableBtn:"Add table", tabRename:"Table name:", delTableConfirm:"Delete this table?", tabTip:"Click to select, double-click to rename", tableDefault:"Table",chartDefault:"Chart", addChartBtn:"Add chart", chTableLabel:"Table for chart", delChartBtn:"Delete chart",
     appTitle:"Physics Lab Table", appSub:"Enter measurement results, build formulas, calculate error",
     setupTitle:"Table setup", setupDesc:"Enter the initial number of rows and columns. You can add or remove rows/columns later.",
     rowsLabel:"Number of rows", colsLabel:"Number of columns", buildBtn:"Build table", rowShort:"Row", colShort:"Column",
@@ -1465,6 +1465,20 @@ function renderTabs(){
     bar.appendChild(b);
   });
   const a=document.createElement('button'); a.type='button'; a.className='tabbtn add'; a.textContent='➕ '+t('addTableBtn'); a.onclick=addTable; bar.appendChild(a);
+  renderChartTabs();
+}
+function chartName(i){ return charts[i].name || (t('chartDefault')+' '+(i+1)); }
+function showChart(ch){ charts.forEach(c=>{ c.root.style.display = c===ch ? '' : 'none'; }); activate(ch); renderChartTabs(); }
+function renderChartTabs(){
+  const bar=document.getElementById('chartTabBar'); if(!bar) return; bar.innerHTML='';
+  charts.forEach((c,i)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='tabbtn'+(c===ACT?' on':''); b.title=t('tabTip');
+    b.innerHTML='<span>'+escH(chartName(i))+'</span>';
+    b.onclick=()=>showChart(c);
+    b.ondblclick=()=>{ const v=prompt(t('tabRename'), chartName(i)); if(v!==null){ c.name=v.trim(); renderChartTabs(); } };
+    bar.appendChild(b);
+  });
+  const a=document.createElement('button'); a.type='button'; a.className='tabbtn add'; a.textContent='➕ '+t('addChartBtn'); a.onclick=()=>addChart(); bar.appendChild(a);
 }
 
 /* ═══ BIR NEÇTA GRAFIK (har birining öz holati; faol grafikka almaştirilib işlanadi) ═══ */
@@ -1482,17 +1496,18 @@ function addChart(){
   const html=document.getElementById('chartTpl').innerHTML.replace(new RegExp(' id="('+CH_IDS.join('|')+')"','g'),' data-cid="$1"');
   const w=document.createElement('div'); w.innerHTML=html; const root=w.firstElementChild;
   document.getElementById('chartsHost').appendChild(root);
-  const ch={root, s:newChartState()}; charts.push(ch);
+  const ch={root, s:newChartState(), name:''}; charts.push(ch);
   ['pointerdown','focusin','change','input','click','keydown','mousemove','touchstart'].forEach(ev=>root.addEventListener(ev,()=>activate(ch),true));
   activate(ch);
   CHBIND.forEach(f=>f()); initChartExtras(); attachGreek(CQ('customFitFormula'));
   root.querySelectorAll('.sw input').forEach(i=>i.addEventListener('change',syncSwitches));
   CQ('btnDelChart').addEventListener('click',()=>{
     if(charts.length<2) return;
-    charts=charts.filter(c=>c!==ch); root.remove(); ACT=null; activate(charts[0]); renderColSelects();
+    charts=charts.filter(c=>c!==ch); root.remove(); ACT=null; showChart(charts[0]); renderColSelects();
   });
   applyI18n(); syncSwitches(); updateFitControlsVisibility(); renderColSelects();
   const ts=CQ('chTable'); if(ts && tables[curTab]) ts.value=tables[curTab].id;
+  showChart(ch);
 }
 
 function makeColId(){ return 'c'+(++colSeq); }
@@ -4327,7 +4342,7 @@ document.querySelectorAll('.sw input').forEach(i=>i.addEventListener('change', s
 applyI18n();
 buildTable(5,3);
 addChart();
-document.getElementById('btnAddChart').addEventListener('click',()=>{ addChart(); });
+
 bindPreview('fExpr','fPreview'); bindPreview('cInput','cPreview');
 render();
 syncTopbarHeight();
