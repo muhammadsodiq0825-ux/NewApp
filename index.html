@@ -4400,7 +4400,7 @@ async function importExcel(file){
     if(typeof XLSX==='undefined'){ showMsg('excelMsg', t('xlsxNotLoaded'), false); return; }
     const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
     const ms=wb.Sheets['_dastur_meta'];
-    const sheetRows=n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''});
+    let imp=null; const sheetRows=n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''});
     if(ms){
       const st=JSON.parse(XLSX.utils.sheet_to_json(ms,{header:1}).map(r=>r[0]||'').join(''));
       const order=wb.SheetNames.filter(n=>n!=='_dastur_meta');
@@ -4418,9 +4418,9 @@ async function importExcel(file){
           }
         });
       });
-      tables=st.tables; tabSeq=st.tabSeq; colSeq=st.colSeq; constSeq=st.constSeq; consts=st.consts;
+      imp={tables:st.tables,consts:st.consts,lastStat:st.lastStat};
     } else {
-      tables=[]; consts=[]; colSeq=0; tabSeq=0; constSeq=0; cols=[]; const pendC=[];
+      const newT=[]; const pendC=[]; let tq=0, cq=0;
       wb.SheetNames.forEach(sn=>{
         const rows=sheetRows(sn); if(!rows.length) return;
         const hdr=rows[0]; let c0=0, nameCol=-1;
@@ -4441,8 +4441,8 @@ async function importExcel(file){
               if(expr && !pendC.some(k=>k.name===nm)) pendC.push({name:nm,expr,exp:e2}); }
           }
         }
-        const TT={id:'t'+(++tabSeq),name:sn,rowCount:Math.max(1,body.length),cellData:{},rowNames:[],hasRowNames:nameCol>=0,cols:[]};
-        tables.push(TT); const ti=tables.length-1;
+        const TT={id:'t'+(++tq),name:sn,rowCount:Math.max(1,body.length),cellData:{},rowNames:[],hasRowNames:nameCol>=0,cols:[]};
+        newT.push(TT); const ti=newT.length-1;
         TT.rowNames=Array.from({length:TT.rowCount},(_,r)=>nameCol>=0&&body[r]?String(body[r][nameCol]):'');
         for(let j=c0;j<hdr.length;j++){
           const h=String(hdr[j]).trim(); if(!h) continue;
@@ -4456,25 +4456,49 @@ async function importExcel(file){
           else if((mm=/^ε\((.+)\)%$/.exec(name)) && TT.cols.some(c=>c.kind==='formula'&&c.header===mm[1])){ kind='relerr'; extra={parent:TT.cols.find(c=>c.kind==='formula'&&c.header===mm[1]).id}; }
           else if(name===t('rowAvgHeader')){ kind='rowavg'; }
           else if(vals.every(v=>typeof v!=='number'&&v==='')) continue;
-          if(kind==='data' && allColsOf().some(c=>c.header===name)) name=autoNameOf(ti,1);
-          const id=makeColId(); const col=Object.assign({id,header:name,kind},extra); if(exp&&kind==='data') col.exp=exp; if(unit) col.unit=unit;
+          const id='c'+(++cq); const col=Object.assign({id,header:name,kind},extra); if(exp&&kind==='data') col.exp=exp; if(unit) col.unit=unit;
           TT.cols.push(col);
           if(kind==='data') TT.cellData[id]=Array.from({length:TT.rowCount},(_,r)=>{ const v=vals[r]; return typeof v==='number'?String(+(v/Math.pow(10,exp)).toPrecision(12)):''; });
         }
       });
-      if(!tables.length) throw new Error('empty');
-      pendC.forEach(k=>{ if(!allColsOf().some(c=>c.header===k.name)){ const o={id:'k'+(++constSeq),name:k.name,expr:k.expr}; if(k.exp) o.exp=k.exp; consts.push(o); } });
+      if(!newT.length) throw new Error('empty'); imp={tables:newT,consts:pendC.map(k=>({name:k.name,expr:k.expr,exp:k.exp||undefined})),lastStat:null};
     }
-    lastStat=null; formulaCache={}; errorCache={}; rowAvgCache={}; curTab=0; loadTab(0); render();
-    const _ls=ms && JSON.parse(XLSX.utils.sheet_to_json(ms,{header:1}).map(r=>r[0]||'').join('')).lastStat;
-    if(_ls && findCol(_ls.colId)){
-      const ti=tables.findIndex(TT=>TT.cols.some(c=>c.id===_ls.colId)); if(ti>=0 && ti!==curTab){ saveTab(); loadTab(ti); render(); }
-      document.getElementById('statCol').value=_ls.colId;
+    const idMap=mergeImport(imp); render();
+    const _ls=imp.lastStat;
+    if(_ls && idMap[_ls.colId]){
+      const nid=idMap[_ls.colId]; const ti=tables.findIndex(TT=>TT.cols.some(c=>c.id===nid));
+      if(ti>=0 && ti!==curTab){ saveTab(); loadTab(ti); render(); }
+      document.getElementById('statCol').value=nid;
       document.getElementById('theorVal').value=(_ls.theor===null||_ls.theor===undefined)?'':String(_ls.theor); document.getElementById('theorExp').value='';
       document.getElementById('btnCalcStat').click();
     }
     showMsg('excelMsg', t('importOk'), true);
   }catch(e){ console.error(e); showMsg('excelMsg', t('importFail')+': '+e.message, false); }
+}
+function mergeImport(imp){
+  saveTab();
+  if(tables.length===1 && !consts.length && cols.every(c=>c.kind==='data' && (cellData[c.id]||[]).every(v=>v===''||v===undefined))){ tables=[]; curTab=0; cols=[]; }
+  const idMap={}, used=new Set(allCols().map(c=>c.header)); const first=tables.length;
+  imp.tables.forEach(IT=>{
+    const nt={id:'t'+(++tabSeq),name:IT.name||'',rowCount:IT.rowCount,rowNames:(IT.rowNames||[]).slice(),hasRowNames:!!IT.hasRowNames,cols:[],cellData:{}};
+    const ren={};
+    IT.cols.forEach(c=>{
+      const nc=Object.assign({},c); nc.id=makeColId(); idMap[c.id]=nc.id;
+      if(c.parent) nc.parent=idMap[c.parent]||c.parent;
+      if(c.kind==='data'||c.kind==='formula'){
+        if(used.has(c.header)){ const pf=PREFIXES[(tables.length)%PREFIXES.length]; let k=1, nm; do{ nm=pf+k; k++; }while(used.has(nm)); ren[c.header]=nm; nc.header=nm; }
+        used.add(nc.header);
+      } else if(c.parent){ const par=IT.cols.find(x=>x.id===c.parent); if(par && ren[par.header]) nc.header=c.header.replace(par.header,ren[par.header]); }
+      if(c.kind==='data') nt.cellData[nc.id]=(IT.cellData[c.id]||[]).slice();
+      nt.cols.push(nc);
+    });
+    if(Object.keys(ren).length){ const names=Object.keys(ren).concat(Object.values(ren)).concat(Object.keys(constVals)).concat(nt.cols.map(x=>x.header));
+      nt.cols.forEach(c=>{ if(c.kind==='formula') c.formula=renameVarInFormula(c.formula,ren,names); }); }
+    tables.push(nt);
+  });
+  (imp.consts||[]).forEach(k=>{ if(consts.some(x=>x.name===k.name) || used.has(k.name)) return; const o=Object.assign({},k); o.id='k'+(++constSeq); consts.push(o); });
+  lastStat=null; loadTab(first<tables.length?first:curTab);
+  return idMap;
 }
 function allColsOf(){ const o=[]; tables.forEach(T=>T.cols.forEach(c=>o.push(c))); return o; }
 function autoNameOf(ti,k){ const used=new Set(allColsOf().map(c=>c.header)); const pf=PREFIXES[ti%PREFIXES.length]; let nm; do{ nm=pf+k; k++; }while(used.has(nm)); return nm; }
