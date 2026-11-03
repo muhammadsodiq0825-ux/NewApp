@@ -648,6 +648,8 @@ table.lab thead th .hunit input.hunit-in:not(:placeholder-shown){border-style:so
         <h2>💾 <span data-i="excelTitle">Excelga saqlaş</span></h2>
         <div class="desc" data-i="excelDesc">Jadval (örtaça qiymatlar bilan) Excel (.xlsx) fayl sifatida saqlanadi.</div>
         <button class="btn btn-green" id="btnExportExcel">📥 <span data-i="excelBtn">Excel faylni saqlaş</span></button>
+        <button class="btn btn-outline" style="margin-top:8px" id="btnImportExcel">📤 <span data-i="importBtn">Excel fayldan yuklaş</span></button>
+        <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none">
         <div id="excelMsg" class="msg"></div>
       </div>
 
@@ -701,7 +703,7 @@ window.xlsxReady = loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0
    ════════════════════════════════════════════════ */
 const I18N = {
   uz:{
-    constInLabel:"Özgarmas (nomi = qiymati)", cInPh:"masalan: c = 3", fInLabel:"Yangi ustun (nomi = formula; LaTeX ham bölaveradi)", fExprPh2:"masalan: I_a = U/R yoki F = m*a", addTableBtn:"Yangi jadval qöşiş", tabRename:"Jadval nomi:", delTableConfirm:"Bu jadval öçirilsinmi?", tabTip:"Tanlaş uçun bosing, nomini özgartiriş uçun ikki marta bosing", tableDefault:"Jadval",chartDefault:"Grafik",nameTaken:"Bu nom boşqa ustunda band — barça jadvallarda özgaruvçi nomlari takrorlanmasligi kerak.",pickTableTitle:"Qaysi jadvalga qöşilsin?",pickTableDesc:"Formulada bir neçta jadval özgaruvçilari bor. Yangi ustun qaysi jadvalga qöşilsin?",cancelPick:"Bekor qilış", addChartBtn:"Yangi grafik qöşiş", chTableLabel:"Grafik uçun jadval", delChartBtn:"Grafikni öçiriş",
+    constInLabel:"Özgarmas (nomi = qiymati)", cInPh:"masalan: c = 3", fInLabel:"Yangi ustun (nomi = formula; LaTeX ham bölaveradi)", fExprPh2:"masalan: I_a = U/R yoki F = m*a", addTableBtn:"Yangi jadval qöşiş", tabRename:"Jadval nomi:", delTableConfirm:"Bu jadval öçirilsinmi?", tabTip:"Tanlaş uçun bosing, nomini özgartiriş uçun ikki marta bosing", tableDefault:"Jadval",chartDefault:"Grafik",importBtn:"Excel fayldan yuklaş",importOk:"Excel fayl yuklandi",importFail:"Faylni oqib bölmadi",nameTaken:"Bu nom boşqa ustunda band — barça jadvallarda özgaruvçi nomlari takrorlanmasligi kerak.",pickTableTitle:"Qaysi jadvalga qöşilsin?",pickTableDesc:"Formulada bir neçta jadval özgaruvçilari bor. Yangi ustun qaysi jadvalga qöşilsin?",cancelPick:"Bekor qilış", addChartBtn:"Yangi grafik qöşiş", chTableLabel:"Grafik uçun jadval", delChartBtn:"Grafikni öçiriş",
     appTitle:"Fizika Laboratoriya Jadvali", appSub:"Ölçov natijalarini kiriting, formulalar tuzing, xatolikni hisoblang",
     setupTitle:"Jadvalni sozlaş", setupDesc:"Boşlanğiç qatorlar va ustunlar sonini kiriting. Keyinçalik qator/ustun qöşiş yoki öçiriş mumkin.",
     rowsLabel:"Qatorlar soni", colsLabel:"Ustunlar soni", buildBtn:"Jadval yaratiş", rowShort:"Qator", colShort:"Ustun",
@@ -761,7 +763,7 @@ const I18N = {
     statFormulaTheor:"Δ = |x₀ − x̄|,   ε% = |x₀ − x̄| / |x₀| · 100%"
   },
   ru:{
-    constInLabel:"Константа (имя = значение)", cInPh:"например: c = 3", fInLabel:"Новый столбец (имя = формула; можно LaTeX)", fExprPh2:"например: I_a = U/R или F = m*a", addTableBtn:"Добавить таблицу", tabRename:"Название таблицы:", delTableConfirm:"Удалить эту таблицу?", tabTip:"Нажмите — выбрать, двойной клик — переименовать", tableDefault:"Таблица",chartDefault:"График",nameTaken:"Это имя уже занято в другом столбце.",pickTableTitle:"В какую таблицу добавить?",pickTableDesc:"В формуле переменные из нескольких таблиц. Куда добавить новый столбец?",cancelPick:"Отмена", addChartBtn:"Добавить график", chTableLabel:"Таблица для графика", delChartBtn:"Удалить график",
+    constInLabel:"Константа (имя = значение)", cInPh:"например: c = 3", fInLabel:"Новый столбец (имя = формула; можно LaTeX)", fExprPh2:"например: I_a = U/R или F = m*a", addTableBtn:"Добавить таблицу", tabRename:"Название таблицы:", delTableConfirm:"Удалить эту таблицу?", tabTip:"Нажмите — выбрать, двойной клик — переименовать", tableDefault:"Таблица",chartDefault:"График",importBtn:"Загрузить из Excel",importOk:"Файл Excel загружен",importFail:"Не удалось прочитать файл",nameTaken:"Это имя уже занято в другом столбце.",pickTableTitle:"В какую таблицу добавить?",pickTableDesc:"В формуле переменные из нескольких таблиц. Куда добавить новый столбец?",cancelPick:"Отмена", addChartBtn:"Добавить график", chTableLabel:"Таблица для графика", delChartBtn:"Удалить график",
     appTitle:"Таблица физической лаборатории", appSub:"Введите результаты измерений, создайте формулы, рассчитайте погрешность",
     setupTitle:"Настройка таблицы", setupDesc:"Введите начальное количество строк и столбцов. Позже можно добавлять или удалять строки/столбцы.",
     rowsLabel:"Количество строк", colsLabel:"Количество столбцов", buildBtn:"Создать таблицу", rowShort:"Строка", colShort:"Столбец",
@@ -822,7 +824,7 @@ const I18N = {
     fNamePh:"например: v", fExprPh:"например: (n1-n2)/t"
   },
   en:{
-    constInLabel:"Constant (name = value)", cInPh:"e.g. c = 3", fInLabel:"New column (name = formula; LaTeX allowed)", fExprPh2:"e.g. I_a = U/R or F = m*a", addTableBtn:"Add table", tabRename:"Table name:", delTableConfirm:"Delete this table?", tabTip:"Click to select, double-click to rename", tableDefault:"Table",chartDefault:"Chart",nameTaken:"This name is already used by another column.",pickTableTitle:"Add to which table?",pickTableDesc:"The formula uses variables from several tables. Which table gets the new column?",cancelPick:"Cancel", addChartBtn:"Add chart", chTableLabel:"Table for chart", delChartBtn:"Delete chart",
+    constInLabel:"Constant (name = value)", cInPh:"e.g. c = 3", fInLabel:"New column (name = formula; LaTeX allowed)", fExprPh2:"e.g. I_a = U/R or F = m*a", addTableBtn:"Add table", tabRename:"Table name:", delTableConfirm:"Delete this table?", tabTip:"Click to select, double-click to rename", tableDefault:"Table",chartDefault:"Chart",importBtn:"Load from Excel",importOk:"Excel file loaded",importFail:"Could not read the file",nameTaken:"This name is already used by another column.",pickTableTitle:"Add to which table?",pickTableDesc:"The formula uses variables from several tables. Which table gets the new column?",cancelPick:"Cancel", addChartBtn:"Add chart", chTableLabel:"Table for chart", delChartBtn:"Delete chart",
     appTitle:"Physics Lab Table", appSub:"Enter measurement results, build formulas, calculate error",
     setupTitle:"Table setup", setupDesc:"Enter the initial number of rows and columns. You can add or remove rows/columns later.",
     rowsLabel:"Number of rows", colsLabel:"Number of columns", buildBtn:"Build table", rowShort:"Row", colShort:"Column",
@@ -3210,7 +3212,7 @@ document.getElementById('btnExportExcel').addEventListener('click', async ()=>{
     await window.xlsxReady;
     if(typeof XLSX==='undefined'){ showMsg('excelMsg', t('xlsxNotLoaded'), false); return; }
 
-    const aoa=[];
+    const buildSheet=()=>{ const aoa=[];
     const colTitle=c=>{ const u=colUnit(c); return c.header+(u?' ('+u+')':'')+(c.exp?' (×10^'+c.exp+')':''); };
     aoa.push([t('trHeader'), t('rowNameHeader'), ...cols.map(colTitle)]); // 2-ustun (qator nomi) pastda ixtiyoriy olib tashlanadi
     for(let r=0;r<rowCount;r++){
@@ -3273,8 +3275,16 @@ document.getElementById('btnExportExcel').addEventListener('click', async ()=>{
     if(!hasRowNames) aoa.forEach(r=>{ if(r.length>1) r.splice(1,1); });
     const ws=XLSX.utils.aoa_to_sheet(aoa);
     ws['!cols']=(hasRowNames?[{wch:8},{wch:24}]:[{wch:8}]).concat(cols.map(()=>({wch:16})));
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Laboratoriya');
+    return ws; };
+    const wb=XLSX.utils.book_new(); saveTab(); const _sn=new Set();
+    tables.forEach((TT,i)=>{ let sn=(tabName(i).replace(/[\\\/?*\[\]:]/g,'_').slice(0,28))||('T'+(i+1)); while(_sn.has(sn)) sn+='_'; _sn.add(sn);
+      XLSX.utils.book_append_sheet(wb, withTab(TT.id, buildSheet), sn); });
+    saveTab();
+    const _meta=JSON.stringify({v:1,tabSeq,colSeq,constSeq,consts:consts.map(k=>({id:k.id,name:k.name,expr:k.expr,exp:k.exp,fromFormula:k.fromFormula})),
+      tables:tables.map(TT=>({id:TT.id,name:TT.name,rowCount:TT.rowCount,rowNames:TT.rowNames,hasRowNames:TT.hasRowNames,cols:TT.cols,cellData:TT.cellData}))});
+    const _rows=[]; for(let i=0;i<_meta.length;i+=30000) _rows.push([_meta.slice(i,i+30000)]);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(_rows), '_dastur_meta');
+    wb.Workbook={Sheets:wb.SheetNames.map(n=>({Hidden:n==='_dastur_meta'?1:0}))};
     const wbout=XLSX.write(wb,{bookType:'xlsx',type:'array'});
     const blob=new Blob([wbout],{type:'application/octet-stream'});
     const fname='laboratoriya_jadvali_'+Date.now()+'.xlsx';
@@ -4383,6 +4393,66 @@ buildTable(5,3);
 addChart();
 
 bindPreview('fExpr','fPreview'); bindPreview('cInput','cPreview');
+/* ═══ EXCELDAN QAYTA YUKLAŞ ═══ */
+async function importExcel(file){
+  try{
+    await window.xlsxReady;
+    if(typeof XLSX==='undefined'){ showMsg('excelMsg', t('xlsxNotLoaded'), false); return; }
+    const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+    const ms=wb.Sheets['_dastur_meta'];
+    const sheetRows=n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''});
+    if(ms){
+      const st=JSON.parse(XLSX.utils.sheet_to_json(ms,{header:1}).map(r=>r[0]||'').join(''));
+      const order=wb.SheetNames.filter(n=>n!=='_dastur_meta');
+      st.tables.forEach((TT,ti)=>{
+        const rows=order[ti]?sheetRows(order[ti]):null; if(!rows) return;
+        const off=1+(TT.hasRowNames?1:0);
+        TT.cols.forEach((c,j)=>{
+          if(c.kind!=='data') return;
+          const e=c.exp||0, arr=TT.cellData[c.id]||(TT.cellData[c.id]=[]);
+          for(let r=0;r<TT.rowCount;r++){
+            const cell=(rows[r+1]||[])[off+j], raw=arr[r];
+            const exv=(raw===undefined||raw==='')?NaN:parseFloat(raw+'e'+e);
+            if(typeof cell==='number'){ if(isNaN(exv)||Math.abs(cell-exv)>1e-9*Math.max(1,Math.abs(exv))) arr[r]=String(+(cell/Math.pow(10,e)).toPrecision(12)); }
+            else if(cell==='' && raw!=='' && raw!==undefined) arr[r]='';
+          }
+        });
+      });
+      tables=st.tables; tabSeq=st.tabSeq; colSeq=st.colSeq; constSeq=st.constSeq; consts=st.consts;
+    } else {
+      tables=[]; consts=[]; colSeq=0; tabSeq=0; cols=[];
+      wb.SheetNames.forEach(sn=>{
+        const rows=sheetRows(sn); if(!rows.length) return;
+        const hdr=rows[0]; let c0=0, nameCol=-1;
+        if(String(hdr[0]).trim()===t('trHeader')) c0=1;
+        if(String(hdr[c0]).trim()===t('rowNameHeader')){ nameCol=c0; c0++; }
+        const body=[]; for(let r=1;r<rows.length;r++){ const row=rows[r]; if(row.every(x=>x==='')||String(row[0]).trim()===t('meanRow')) break; body.push(row); }
+        const TT={id:'t'+(++tabSeq),name:sn,rowCount:Math.max(1,body.length),cellData:{},rowNames:[],hasRowNames:nameCol>=0,cols:[]};
+        tables.push(TT); const ti=tables.length-1;
+        TT.rowNames=Array.from({length:TT.rowCount},(_,r)=>nameCol>=0&&body[r]?String(body[r][nameCol]):'');
+        for(let j=c0;j<hdr.length;j++){
+          const h=String(hdr[j]).trim(); if(!h) continue;
+          let name=h, exp=0, unit='';
+          let m=/^(.*?)\s*\(×10\^(-?\d+)\)$/.exec(name); if(m){ name=m[1]; exp=parseInt(m[2],10); }
+          m=/^(.*?)\s*\(([^()]*)\)$/.exec(name); if(m && m[1]){ name=m[1]; unit=m[2]; }
+          const vals=body.map(r=>r[j]); if(vals.every(v=>typeof v!=='number'&&v==='')) continue;
+          if(allColsOf().some(c=>c.header===name)) name=autoNameOf(ti,1);
+          const id=makeColId(); const col={id,header:name,kind:'data'}; if(exp) col.exp=exp; if(unit) col.unit=unit;
+          TT.cols.push(col);
+          TT.cellData[id]=Array.from({length:TT.rowCount},(_,r)=>{ const v=vals[r]; return typeof v==='number'?String(+(v/Math.pow(10,exp)).toPrecision(12)):''; });
+        }
+      });
+      if(!tables.length) throw new Error('empty');
+    }
+    lastStat=null; formulaCache={}; errorCache={}; rowAvgCache={}; curTab=0; loadTab(0); render();
+    showMsg('excelMsg', t('importOk')+(ms?'':' (formulalarsiz)'), true);
+  }catch(e){ console.error(e); showMsg('excelMsg', t('importFail')+': '+e.message, false); }
+}
+function allColsOf(){ const o=[]; tables.forEach(T=>T.cols.forEach(c=>o.push(c))); return o; }
+function autoNameOf(ti,k){ const used=new Set(allColsOf().map(c=>c.header)); const pf=PREFIXES[ti%PREFIXES.length]; let nm; do{ nm=pf+k; k++; }while(used.has(nm)); return nm; }
+document.getElementById('btnImportExcel').addEventListener('click',()=>document.getElementById('excelFile').click());
+document.getElementById('excelFile').addEventListener('change',e=>{ const f=e.target.files[0]; e.target.value=''; if(f) importExcel(f); });
+
 render();
 syncTopbarHeight();
 if(isTouchDevice) document.body.classList.add('is-touch');
