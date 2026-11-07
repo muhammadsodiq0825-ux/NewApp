@@ -41,6 +41,8 @@ const CSS = `
 #fxCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 #fxSpot{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(460px circle at var(--mx,50%) var(--my,30%),rgba(34,211,238,.13),transparent 62%)}
 .app-shell{position:relative;z-index:1}
+.card{background:rgba(255,255,255,.9)}
+.card:hover{box-shadow:0 22px 46px -22px rgba(37,99,235,.5),0 2px 6px rgba(11,26,58,.06)}
 .topbar::before{display:none}
 .topbar .logo{animation:logoPulse 3.2s ease-in-out infinite}
 @keyframes logoPulse{0%,100%{box-shadow:0 0 0 2px rgba(34,211,238,.7),0 0 20px rgba(34,211,238,.4)}50%{box-shadow:0 0 0 4px rgba(34,211,238,.35),0 0 34px rgba(34,211,238,.75)}}
@@ -51,6 +53,43 @@ const CSS = `
 .btn:active{transform:scale(.98)}
 *{scrollbar-width:thin;scrollbar-color:#9db6e6 transparent}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:linear-gradient(#7aa5ff,#22d3ee);border-radius:99px}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;border-radius:22px;padding:26px 30px 44px;color:#fff;display:flex;align-items:center;gap:20px;min-height:230px;
+  background:radial-gradient(700px 300px at 85% 10%,rgba(34,211,238,.28),transparent 60%),radial-gradient(500px 260px at 0% 100%,rgba(251,191,36,.16),transparent 60%),linear-gradient(120deg,#050d22 0%,#0a1f55 55%,#123a96 100%);
+  box-shadow:0 30px 60px -28px rgba(5,13,34,.85),inset 0 0 0 1px rgba(125,190,255,.25);transition:min-height .4s ease,padding .4s ease}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(125,190,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(125,190,255,.10) 1px,transparent 1px);background-size:28px 28px;
+  -webkit-mask-image:radial-gradient(ellipse at 70% 40%,#000,transparent 75%);mask-image:radial-gradient(ellipse at 70% 40%,#000,transparent 75%);pointer-events:none}
+.hero-left{position:relative;flex:1;min-width:0;z-index:2}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;font:700 11px/1 'JetBrains Mono',ui-monospace,monospace;letter-spacing:2.4px;color:#7dd3fc;margin-bottom:10px}
+.hero-kicker i{width:8px;height:8px;border-radius:50%;background:#22d3ee;box-shadow:0 0 0 0 rgba(34,211,238,.7);animation:ping 1.8s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 10px rgba(34,211,238,0)}100%{box-shadow:0 0 0 0 rgba(34,211,238,0)}}
+.hero-title{font:700 clamp(26px,4.2vw,44px)/1.1 'Space Grotesk','IBM Plex Sans',sans-serif;letter-spacing:.3px}
+.hero-title b{background:linear-gradient(90deg,#67e8f9,#fde68a,#67e8f9);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:200% 0}}
+.hero-sub{margin-top:8px;color:#b9cdf5;font-size:14.5px;max-width:560px}
+.hero-formula{margin-top:14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;min-height:34px}
+.hero-formula .eq{font:700 22px/1 'JetBrains Mono',ui-monospace,monospace;color:#fde68a;text-shadow:0 0 16px rgba(251,191,36,.55)}
+.hero-formula .eq::after{content:"▌";margin-left:2px;color:#22d3ee;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hero-formula small{color:#93b4ea;font-size:12.5px}
+.hero-stats{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.hs{min-width:92px;padding:9px 14px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(125,190,255,.28);backdrop-filter:blur(4px)}
+.hs b{display:block;font:700 22px/1.1 'JetBrains Mono',ui-monospace,monospace;color:#fff}
+.hs span{font-size:11.5px;color:#9fbcf0;letter-spacing:.3px}
+.hero-atom{position:relative;z-index:2;width:230px;height:230px;flex:none;filter:drop-shadow(0 0 18px rgba(34,211,238,.55))}
+.hero-atom svg{width:100%;height:100%}
+.hero-wave{position:absolute;left:0;bottom:0;width:100%;height:42px;pointer-events:none;opacity:.9}
+.hero-wave div{position:absolute;left:0;bottom:0;width:200%;height:100%;background-repeat:repeat-x;background-size:50% 100%}
+.hero-wave .w1{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 42' preserveAspectRatio='none'%3E%3Cpath d='M0 21 C50 0 100 0 150 21 S250 42 300 21 S350 0 400 21 V42 H0Z' fill='%2322d3ee' fill-opacity='.22'/%3E%3C/svg%3E");animation:wave 9s linear infinite}
+.hero-wave .w2{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 42' preserveAspectRatio='none'%3E%3Cpath d='M0 26 C60 6 120 6 180 26 S300 46 360 26 S390 14 400 26 V42 H0Z' fill='%23fbbf24' fill-opacity='.16'/%3E%3C/svg%3E");animation:wave 14s linear infinite reverse}
+@keyframes wave{to{transform:translateX(-50%)}}
+.hero-x{position:absolute;right:14px;top:12px;z-index:3;width:30px;height:30px;border-radius:50%;border:1px solid rgba(125,190,255,.4);background:rgba(255,255,255,.08);color:#cfe0ff;cursor:pointer;font-size:14px;transition:.3s}
+.hero-x:hover{background:rgba(34,211,238,.25)}
+.hero.min{min-height:0;padding:14px 30px}
+.hero.min .hero-sub,.hero.min .hero-formula,.hero.min .hero-stats,.hero.min .hero-atom,.hero.min .hero-wave,.hero.min .hero-kicker{display:none}
+.hero.min .hero-title{font-size:20px}.hero.min .hero-x{transform:rotate(180deg)}
+@media(max-width:820px){.hero{padding:20px 18px 40px}.hero-atom{position:absolute;right:-30px;top:-10px;width:150px;height:150px;opacity:.5}.hero-formula .eq{font-size:17px}}
 
 /* SPLASH */
 #splash{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;cursor:pointer;
@@ -64,140 +103,76 @@ const CSS = `
 #splash .sp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#fbbf24);animation:spBar 1.6s ease forwards .15s}
 @keyframes spUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes spBar{to{width:100%}}
-@media(prefers-reduced-motion:reduce){#splash,.topbar .logo{animation:none!important}}
-
-/* ═══ YUMSHOQ · ILHOMLANTIRUVCHI KARTALAR (köz çarçatmaydi) ═══ */
-body{background-color:#e8edf9;background-image:radial-gradient(1000px 520px at 92% -10%,rgba(124,58,237,.10),transparent 62%),radial-gradient(900px 480px at -10% 22%,rgba(34,211,238,.13),transparent 60%),radial-gradient(800px 500px at 62% 112%,rgba(251,191,36,.11),transparent 60%),linear-gradient(rgba(37,99,235,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,.045) 1px,transparent 1px);background-size:auto,auto,auto,32px 32px,32px 32px}
-
-/* rang mavzulari: har bir band özining rangida */
-.card{--c1:#2563eb;--c2:#38bdf8;--c1r:37,99,235;--c2r:56,189,248;--t1:#f3f7ff;--t2:#e8f0ff;--ink:#1e3a8a}
-.main-panel>section.card:nth-of-type(1){--c1:#0d9488;--c2:#2dd4bf;--c1r:13,148,136;--c2r:45,212,191;--t1:#f1fbf9;--t2:#e3f6f3;--ink:#0f5f59}
-.main-panel>section.card:nth-of-type(2){--c1:#2563eb;--c2:#38bdf8;--c1r:37,99,235;--c2r:56,189,248;--t1:#f3f7ff;--t2:#e6efff;--ink:#1e3a8a}
-.main-panel>section.card:nth-of-type(3){--c1:#4f46e5;--c2:#818cf8;--c1r:79,70,229;--c2r:129,140,248;--t1:#f4f4ff;--t2:#e9eaff;--ink:#312e81}
-.main-panel>section.card:nth-of-type(4){--c1:#7c3aed;--c2:#c084fc;--c1r:124,58,237;--c2r:192,132,252;--t1:#f8f3ff;--t2:#efe6ff;--ink:#4c1d95}
-.main-panel>section.card:nth-of-type(5){--c1:#d97706;--c2:#fbbf24;--c1r:217,119,6;--c2r:251,191,36;--t1:#fffaee;--t2:#fff1d3;--ink:#78350f}
-.chart-card{--c1:#059669;--c2:#34d399;--c1r:5,150,105;--c2r:52,211,153;--t1:#f0fcf5;--t2:#e0f6ea;--ink:#065f46}
-.sidebar .card:nth-child(1){--c1:#e11d48;--c2:#fb7185;--c1r:225,29,72;--c2r:251,113,133;--t1:#fff4f6;--t2:#ffe7ec;--ink:#9f1239}
-.sidebar .card:nth-child(2){--c1:#d97706;--c2:#fbbf24;--c1r:217,119,6;--c2r:251,191,36;--t1:#fffaee;--t2:#fff1d3;--ink:#78350f}
-.sidebar .card:nth-child(3){--c1:#059669;--c2:#34d399;--c1r:5,150,105;--c2r:52,211,153;--t1:#f0fcf5;--t2:#e0f6ea;--ink:#065f46}
-.sidebar .card:nth-child(4){--c1:#64748b;--c2:#94a3b8;--c1r:100,116,139;--c2r:148,163,184;--t1:#f5f7fb;--t2:#e9edf5;--ink:#334155}
-
-.card{border:1px solid rgba(var(--c1r),.22);border-radius:18px;
-  background:radial-gradient(300px 180px at 100% 0%,rgba(var(--c2r),.24),transparent 70%),radial-gradient(240px 140px at 0% 100%,rgba(var(--c1r),.08),transparent 70%),linear-gradient(165deg,var(--t1),var(--t2));
-  box-shadow:0 18px 38px -24px rgba(var(--c1r),.6),0 2px 6px rgba(15,23,42,.05);
-  animation:cardRise .55s ease backwards;transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease}
-.card:hover{transform:translateY(-3px);border-color:rgba(var(--c1r),.45);box-shadow:0 26px 48px -22px rgba(var(--c1r),.7),0 0 0 4px rgba(var(--c2r),.14)}
-.card::before{height:4px;border-radius:18px 18px 0 0;background:linear-gradient(90deg,var(--c1),var(--c2),#fbbf24,var(--c2),var(--c1));background-size:200% 100%;animation:stripeFlow 8s linear infinite}
-@keyframes stripeFlow{to{background-position:200% 0}}
-/* burçakdagi nuqtalar to'ri: ilmiy ruh, lekin matnga xalal bermaydi */
-.card::after{content:"";position:absolute;left:0;bottom:0;width:190px;height:120px;pointer-events:none;border-radius:0 0 0 18px;
-  background:radial-gradient(rgba(var(--c1r),.22) 1.3px,transparent 1.7px) 0 0/14px 14px;
-  -webkit-mask-image:radial-gradient(130px 90px at 0% 100%,#000,transparent 75%);mask-image:radial-gradient(130px 90px at 0% 100%,#000,transparent 75%);opacity:.7}
-.main-panel>section.card:nth-of-type(2){animation-delay:.05s}
-.main-panel>section.card:nth-of-type(3){animation-delay:.1s}
-.main-panel>section.card:nth-of-type(4){animation-delay:.15s}
-.main-panel>section.card:nth-of-type(5){animation-delay:.2s}
-.sidebar .card:nth-child(2){animation-delay:.08s}.sidebar .card:nth-child(3){animation-delay:.16s}.sidebar .card:nth-child(4){animation-delay:.24s}
-
-.card h2{gap:11px;align-items:center;font-size:16.5px;color:var(--ink)}
-.card h2 .ico{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 7px;border-radius:11px;font-size:17px;font-weight:800;color:#fff;flex-shrink:0;
-  background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 8px 16px -8px rgba(var(--c1r),.95),inset 0 1px 0 rgba(255,255,255,.45);transition:transform .3s ease}
-.card:hover h2 .ico{transform:rotate(-8deg) scale(1.1)}
-.card .desc{color:#55657f}
-
-/* kiritish maydonlari: sof oppoq emas, yumşoq */
-input[type=text],input[type=number],select,textarea{background:rgba(255,255,255,.74);border-color:rgba(var(--c1r,37,99,235),.24)}
-input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus{background:#fff;border-color:var(--c2,#22d3ee);box-shadow:0 0 0 3px rgba(var(--c2r,34,211,238),.3)}
-.opt-row,.fitem,.varhint,.help-panel,.greek-pal,.stat-result-box,.legend-set,.chart-wrap{background:rgba(255,255,255,.5);border-color:rgba(var(--c1r,37,99,235),.18)}
-.help-panel .ex,.help-panel code,.stat-item,.stat-formula,.legend-set .opt-row,.gkey{background:rgba(255,255,255,.72)}
-.fitem{border-left:3px solid var(--c1,#2563eb)}
-.fpreview{background:linear-gradient(135deg,rgba(var(--c2r,56,189,248),.14),rgba(255,255,255,.5));border:1px dashed rgba(var(--c1r,37,99,235),.4)}
-.fit-stat{background:rgba(255,255,255,.6)}
-.fit-eq{background:linear-gradient(135deg,rgba(var(--c1r,5,150,105),.12),rgba(var(--c2r,52,211,153),.18));color:var(--ink,#065f46)}
-.chart-wrap{background:linear-gradient(160deg,rgba(255,255,255,.55),rgba(var(--c2r,52,211,153),.14))}
-.fit-canvas{box-shadow:0 10px 26px -14px rgba(var(--c1r,5,150,105),.55)}
-
-/* tugmalar: jonli, lekin yumşoq gradientlar */
-.btn{transition:transform .18s ease,box-shadow .2s ease,filter .2s ease}
-.btn:hover{transform:translateY(-2px)}
-.btn-green{background:linear-gradient(135deg,#059669,#10b981 60%,#2dd4bf);box-shadow:0 8px 18px -8px rgba(5,150,105,.75)}
-.btn-green:hover{background:linear-gradient(135deg,#047857,#059669 60%,#14b8a6);box-shadow:0 12px 22px -8px rgba(5,150,105,.85)}
-.btn-violet{background:linear-gradient(135deg,#6d28d9,#8b5cf6 60%,#c084fc);box-shadow:0 8px 18px -8px rgba(124,58,237,.75)}
-.btn-violet:hover{background:linear-gradient(135deg,#5b21b6,#7c3aed 60%,#a855f7);box-shadow:0 12px 22px -8px rgba(124,58,237,.85)}
-.btn-teal{background:linear-gradient(135deg,#0f766e,#14b8a6 60%,#22d3ee);box-shadow:0 8px 18px -8px rgba(13,148,136,.75)}
-.btn-teal:hover{background:linear-gradient(135deg,#115e59,#0d9488 60%,#06b6d4);box-shadow:0 12px 22px -8px rgba(13,148,136,.85)}
-.btn-outline{background:rgba(255,255,255,.6)}
-.btn-outline:hover{background:linear-gradient(135deg,var(--accent),#0ea5e9)}
-.btn-ghost{background:rgba(255,255,255,.65);border-color:rgba(var(--c1r,37,99,235),.25)}
-.btn-ghost:hover{background:rgba(255,255,255,.95);border-color:var(--c1,#2563eb)}
-.btn-danger{background:rgba(255,241,242,.8)}
-.sw .sw-track{background:rgba(255,255,255,.7)}
-.sw input:checked ~ .sw-track{background:linear-gradient(135deg,var(--c1,#2563eb),var(--c2,#22d3ee));border-color:transparent}
-.tabbtn{background:rgba(255,255,255,.7)}
-.tabbtn:hover{transform:translateY(-1px)}
-
-/* jadval: köz toliqtirmaydigan yumşoq tuslar */
-.table-wrap{background:rgba(255,255,255,.5);border:1px solid rgba(79,70,229,.28);box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 14px 30px -20px rgba(79,70,229,.55)}
-.table-wrap table thead th{background:linear-gradient(180deg,#e3e8ff,#d2dbff)!important;border-color:#bfc9f3!important;color:#312e81}
-table.lab thead th.rowhead-col,table.lab thead th.rowname-col,table.lab td.rowhead{background:#dde3f8!important}
-table.lab tbody tr:nth-child(even) td{background-image:linear-gradient(rgba(79,70,229,.065),rgba(79,70,229,.065))}
-table.lab tbody td.rowname,table.lab tbody tr:nth-child(even) td.rowname{background:#e9edfb}
-.table-wrap tbody tr:hover td{background-color:#e4ecff;background-image:none}
-table.lab tbody tr:hover td.formula-cell{background-color:#e9deff}
-table.lab tbody tr:hover td.abserr-cell{background-color:#ffecc4}
-table.lab tbody tr:hover td.relerr-cell{background-color:#d6f6e2}
-table.lab tbody tr:hover td.rowavg-cell{background-color:#d3f3ef}
-table.lab tbody td input:focus{background:rgba(var(--c2r,56,189,248),.22)}
-
-/* yon panel va oynalar */
-.sidebar{background:linear-gradient(180deg,#e4eafa,#dce5f7);border-left:1px solid rgba(79,70,229,.18)}
-.guide-box{background:linear-gradient(180deg,#f5f8ff,#ebf1fd)}
-.guide-head{background:linear-gradient(90deg,rgba(var(--c2r,56,189,248),.18),transparent)}
-.guide-toc{background:rgba(255,255,255,.4)}
-.guide-chip{background:rgba(255,255,255,.75)}
-.gex{background:rgba(255,255,255,.6)}
-.dlg{background:linear-gradient(180deg,#f8faff,#edf3ff)}
-
-/* muvaffaqiyat uçqunlari */
-.spk{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:9999;box-shadow:0 0 8px currentColor;animation:spk .9s ease-out forwards}
-@keyframes spk{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
-@media(prefers-reduced-motion:reduce){.card,.card::before{animation:none!important}.card:hover,.btn:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.hero *,.hero,#splash,.topbar .logo{animation:none!important}}
 `;
 
-/* ── 2. KARTA IKONKALARI VA UÇQUNLAR ───────────────────────── */
-function iconBadges(root){
-  (root||document).querySelectorAll('.card h2').forEach(h=>{
-    if(h.querySelector(':scope > .ico')) return;
-    const n=h.firstChild;
-    if(n && n.nodeType===3 && n.textContent.trim()){
-      const s=document.createElement('span'); s.className='ico'; s.textContent=n.textContent.trim(); h.replaceChild(s,n);
-    }
-  });
-}
-function badges(){
-  iconBadges();
-  const host=$('#chartsHost');
-  if(host) new MutationObserver(()=>iconBadges(host)).observe(host,{childList:true});
-}
-function sparkles(){
-  if(reduce) return;
-  const cols=['#22d3ee','#fbbf24','#a78bfa','#34d399','#fb7185'];
-  const burst=(el)=>{
-    const r=el.getBoundingClientRect(), x0=r.left+Math.min(r.width/2,60), y0=r.top+r.height/2;
-    for(let i=0;i<12;i++){
-      const p=document.createElement('i'), a=Math.random()*6.283, d=26+Math.random()*48, c=cols[i%cols.length];
-      p.className='spk';
-      p.style.cssText='left:'+x0+'px;top:'+y0+'px;background:'+c+';color:'+c+';--dx:'+(Math.cos(a)*d).toFixed(1)+'px;--dy:'+(Math.sin(a)*d-14).toFixed(1)+'px';
-      document.body.appendChild(p); setTimeout(()=>p.remove(),950);
-    }
+/* ── 2. HERO ───────────────────────────────────────────────── */
+const TXT = {
+  uz:{sub:'Ölçovdan formulagaça, xatolikdan grafikgaça — hammasi bir joyda.',stats:['jadval','ustun','qiymat','grafik'],hide:'Yig\'iş / yoyiş'},
+  ru:{sub:'От измерений до формул, от погрешностей до графиков — всё в одном месте.',stats:['таблиц','столбцов','значений','графиков'],hide:'Свернуть / развернуть'},
+  en:{sub:'From measurements to formulas, from errors to graphs — all in one place.',stats:['tables','columns','values','charts'],hide:'Collapse / expand'}
+};
+const TITLE = {uz:['Fizika','Laboratoriya','Jadvali'],ru:['Физика','Лаборатория','Таблица'],en:['Physics','Laboratory','Table']};
+const EQ = [
+  ['E = mc²',{uz:'massa va energiya ekvivalenti',ru:'эквивалентность массы и энергии',en:'mass–energy equivalence'}],
+  ['F = ma',{uz:'Nyutonning ikkinçi qonuni',ru:'второй закон Ньютона',en:"Newton's second law"}],
+  ['λ = h / p',{uz:'de Broyl töłqin uzunligi',ru:'длина волны де Бройля',en:'de Broglie wavelength'}],
+  ['ΔxΔp ≥ ħ/2',{uz:'Heyzenberg noaniqlik prinsipi',ru:'принцип неопределённости',en:'uncertainty principle'}],
+  ['∇·E = ρ/ε₀',{uz:'Gauss qonuni',ru:'закон Гаусса',en:"Gauss's law"}],
+  ['S = k ln W',{uz:'Boltsman entropiyasi',ru:'энтропия Больцмана',en:'Boltzmann entropy'}],
+  ['pV = nRT',{uz:'ideal gaz tenglamasi',ru:'уравнение идеального газа',en:'ideal gas law'}],
+  ['iħ ∂ψ/∂t = Ĥψ',{uz:'Şredinger tenglamasi',ru:'уравнение Шрёдингера',en:'Schrödinger equation'}]
+];
+let heroEl=null;
+function curLang(){ try{ return (typeof lang!=='undefined' && TXT[lang]) ? lang : 'uz'; }catch(e){ return 'uz'; } }
+function buildHero(){
+  const main=$('.main-panel'); if(!main) return;
+  const h=document.createElement('section'); h.className='hero'; h.id='hero';
+  h.innerHTML=`<div class="hero-left">
+      <div class="hero-kicker"><i></i>SCIENTIFIC LAB SUITE</div>
+      <div class="hero-title"><span id="hT1"></span> <b id="hT2"></b> <span id="hT3"></span></div>
+      <div class="hero-sub" id="hSub"></div>
+      <div class="hero-formula"><span class="eq" id="hEq"></span><small id="hEqN"></small></div>
+      <div class="hero-stats">${['tables','cols','vals','charts'].map(k=>`<div class="hs"><b data-k="${k}">0</b><span></span></div>`).join('')}</div>
+    </div>
+    <div class="hero-atom">${ATOM_SVG('h')}</div>
+    <div class="hero-wave"><div class="w1"></div><div class="w2"></div></div>
+    <button class="hero-x" type="button" id="heroX">▾</button>`;
+  main.insertBefore(h,main.firstChild); heroEl=h;
+  try{ if(localStorage.getItem('fizHeroMin')==='1') h.classList.add('min'); }catch(e){}
+  $('#heroX').addEventListener('click',()=>{ h.classList.toggle('min'); try{ localStorage.setItem('fizHeroMin',h.classList.contains('min')?'1':'0'); }catch(e){} });
+  applyLang();
+  // formulalar almaşib turadi (yozilib çiqadi)
+  let ei=0, timer=null;
+  const typeEq=()=>{
+    const [eq,nm]=EQ[ei%EQ.length]; ei++; const el=$('#hEq'), nel=$('#hEqN'); if(!el) return;
+    nel.textContent=''; let i=0; clearInterval(timer);
+    if(reduce){ el.textContent=eq; nel.textContent=nm[curLang()]; return; }
+    timer=setInterval(()=>{ el.textContent=eq.slice(0,++i); if(i>=eq.length){ clearInterval(timer); nel.textContent=nm[curLang()]; } },70);
   };
-  new MutationObserver(ms=>{
-    for(const m of ms){
-      const el=m.target;
-      if(!el.classList || !el.classList.contains('msg') || !el.classList.contains('ok') || !el.classList.contains('show')) continue;
-      if((m.oldValue||'').split(' ').indexOf('show')===-1) burst(el);
-    }
-  }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class'],attributeOldValue:true});
+  typeEq(); setInterval(()=>{ if(!document.hidden && !h.classList.contains('min')) typeEq(); },5200);
+  document.addEventListener('click',e=>{ if(e.target.closest && e.target.closest('.lang-btn')) setTimeout(()=>{ applyLang(); },80); });
+  updateStats(true); setInterval(()=>updateStats(false),1200);
+}
+function applyLang(){
+  if(!heroEl) return; const L=curLang(), T=TXT[L], ti=TITLE[L];
+  $('#hT1').textContent=ti[0]; $('#hT2').textContent=ti[1]; $('#hT3').textContent=ti[2]; $('#hSub').textContent=T.sub;
+  heroEl.querySelectorAll('.hs span').forEach((s,i)=>s.textContent=T.stats[i]); $('#heroX').title=T.hide;
+}
+const shown={};
+function countTo(el,to){
+  const from=shown[el.dataset.k]||0; shown[el.dataset.k]=to; if(from===to) return;
+  if(reduce){ el.textContent=to; return; }
+  const t0=performance.now(), d=600;
+  (function step(t){ const p=Math.min(1,(t-t0)/d), e=1-Math.pow(1-p,3); el.textContent=Math.round(from+(to-from)*e); if(p<1) requestAnimationFrame(step); })(t0);
+}
+function updateStats(first){
+  if(!heroEl || (heroEl.classList.contains('min') && !first)) return;
+  let tb=0,cl=0,vl=0,ch=0;
+  try{ tb=tables.length; cl=allCols().length; ch=charts.length;
+    tables.forEach((T,i)=>{ const cd=(i===curTab?cellData:T.cellData)||{}; Object.keys(cd).forEach(k=>{ (cd[k]||[]).forEach(v=>{ if(v!==''&&v!==undefined&&v!==null) vl++; }); }); }); }catch(e){}
+  const v={tables:tb,cols:cl,vals:vl,charts:ch};
+  heroEl.querySelectorAll('.hs b').forEach(b=>countTo(b,v[b.dataset.k]));
 }
 
 /* ── 3. ORQA FON: zarralar maydoni ─────────────────────────── */
@@ -261,7 +236,7 @@ function splash(){
 /* ── 5. ISHGA TÜŞIRIŞ ──────────────────────────────────────── */
 function start(){
   safe(()=>{ const st=document.createElement('style'); st.id='designCss'; st.textContent=CSS; document.head.appendChild(st); },'css');
-  safe(splash,'splash'); safe(badges,'badges'); safe(sparkles,'sparkles'); safe(bgFx,'bg'); safe(spotlight,'spot'); safe(scrollBar,'scroll'); safe(ripple,'ripple');
+  safe(splash,'splash'); safe(buildHero,'hero'); safe(bgFx,'bg'); safe(spotlight,'spot'); safe(scrollBar,'scroll'); safe(ripple,'ripple');
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
