@@ -399,8 +399,9 @@ table.lab thead th .hunit input.hunit-in:not(:placeholder-shown){border-style:so
 
 /* ══ RESPONSIVE ══════════════════════════════════ */
 @media(max-width:900px){
-  .layout{flex-direction:column;align-items:stretch;width:100%;max-width:100%}
-  .main-panel{width:100%;max-width:100%;box-sizing:border-box}
+  .layout{flex-direction:column;align-items:stretch;width:100%;max-width:100vw}
+  .main-panel,.sidebar{width:100%;max-width:100%;min-width:0}
+  html,body{overflow-x:hidden}
   .sidebar{width:100%;min-width:0;position:static;height:auto;border-left:none;border-top:1px solid var(--border)}
   .main-panel{padding:16px 14px 40px}
   .topbar{padding:10px 14px}
@@ -4612,6 +4613,6 @@ if(fSymToggleBtn){
   });
 }
 </script>
-<script src="design.js"></script>
+<script src="design.js" defer></script>
 </body>
 </html>
