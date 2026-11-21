@@ -588,6 +588,31 @@ tr.stat-mean td{background:linear-gradient(180deg,#ffeeb4,#ffe28f)!important;col
 .opt-row.smooth-lvl .rv{font-weight:700;color:var(--accent);margin-left:6px}
 .opt-row.smooth-lvl input[type=range]{width:100%;accent-color:var(--accent)}
 #videoCard .video-wrap{max-width:1280px;margin-left:auto;margin-right:auto}
+
+/* ══ IKKINÇI BOĞLANIŞ, bir qatorli ranglar va ölçamlar ══ */
+.series2-wrap{margin:2px 0 12px;padding:10px 12px;border:1px dashed var(--accent-ring,#9fc0ff);border-radius:12px;background:rgba(255,255,255,.55)}
+.series2-wrap .s2-title{font-size:12px;font-weight:800;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px}
+.s2-pick .seg{display:flex;gap:6px;flex-wrap:wrap}
+.s2-pick .seg-b{flex:1 1 120px;width:auto;padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;font-weight:800;font-size:13px;cursor:pointer;color:var(--navy2)}
+.s2-pick .seg-b.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.style-row{grid-column:1/-1;display:flex;flex-wrap:nowrap;gap:12px;align-items:flex-end}
+.style-row > *{flex:1 1 0;min-width:0}
+.style-row .cp-wrap{grid-column:auto}
+.style-row .cp-wrap{display:block;margin-bottom:6px}
+.style-row .cp-wrap>span{display:block;font-size:12px;color:var(--sub);margin-bottom:5px;font-weight:600}
+.style-row label.f{margin-bottom:6px}
+.chart-card:not([data-sty="2"]) .sg2{display:none!important}
+.chart-card[data-sty="2"] .sg1{display:none!important}
+.cp-box{position:relative;display:block;padding:0;border:0;background:none}
+.cp-box .cp-cur{cursor:pointer;display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.8);min-width:0}
+.cp-box .cp-cur:hover,.cp-box.open .cp-cur{border-color:var(--accent)}
+.cp-box .cp-car{margin-left:auto;color:var(--sub);font-size:11px}
+.cp-box .cp-hex{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp-box .cp-pop{display:none;position:absolute;z-index:40;left:0;top:calc(100% + 6px);width:min(330px,88vw);padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:0 14px 34px rgba(15,23,42,.22);flex-wrap:wrap;align-items:center;gap:8px 12px}
+.cp-box.open .cp-pop{display:flex}
+.style-row .cp-wrap:nth-child(2) .cp-pop{left:50%;transform:translateX(-50%)}
+.style-row .cp-wrap:last-child .cp-pop{left:auto;right:0}
+.style-row .cp-wrap:first-child:last-child .cp-pop{left:0;right:auto;transform:none}
 #videoCard .video-link{display:flex;max-width:1280px;margin:10px auto 0}
 </style>
 </head>
@@ -790,13 +815,14 @@ tr.stat-mean td{background:linear-gradient(180deg,#ffeeb4,#ffe28f)!important;col
         <div class="varhint" data-i="extraHint" style="margin:0 0 10px"></div>
         <details class="style-box"><summary>🎨 <span data-i="styleTitle">Grafik körinişi (nuqta, çiziq, shakl)</span></summary>
           <div class="style-grid">
+            <div class="f s2-pick" id="styleSeriesWrap" style="grid-column:1/-1;display:none"><span data-i="styleSeriesLbl">Qaysi boğlanişning körinişi sozlansin</span>
+              <div class="seg"><button type="button" class="seg-b on" id="styleSeries1" data-i="styleSeries1">1-boğlaniş</button><button type="button" class="seg-b" id="styleSeries2" data-i="styleSeries2">2-boğlaniş</button></div></div>
             <label class="f"><span data-i="shapeLbl">Grafik shakli</span><select id="chShape"><option value="std" data-i="shStd">Standart</option><option value="wide" data-i="shWide">Keng (16:9)</option><option value="ultra" data-i="shUltra">Juda keng (7:3)</option><option value="square" data-i="shSquare">Kvadrat (1:1)</option><option value="tall" data-i="shTall">Böyiga (3:4)</option><option value="custom" data-i="shCustom">Qölda (chetidan sudrab)</option></select></label>
             <label class="f"><span data-i="ptEveryLbl">Qaysi nuqtalar körinsin</span><select id="ptEvery"><option value="1" data-i="pe1">Hammasi</option><option value="2" data-i="pe2">Har 2-si</option><option value="3" data-i="pe3">Har 3-si</option><option value="5" data-i="pe5">Har 5-si</option><option value="10" data-i="pe10">Har 10-si</option><option value="20" data-i="pe20">Har 20-si</option><option value="sel" data-i="peSel">Qölda tanlanganlar</option></select></label>
-            <label class="f"><span><span data-i="ptSizeLbl">Nuqta hajmi</span><b class="rv"></b></span><input type="range" id="ptSize" min="1" max="12" step="0.1" value="4.2"></label>
-            <div class="f cp-wrap"><span data-i="ptColorLbl">Nuqta rangi</span><input type="color" id="ptColor" value="#dc2626" class="cp-native"></div>
-            <label class="f"><span><span data-i="lnWidthLbl">Çiziq qalinligi</span><b class="rv"></b></span><input type="range" id="lnWidth" min="0.5" max="8" step="0.1" value="2.4"></label>
-            <div class="f cp-wrap"><span data-i="fitColorLbl">Best fit çiziq rangi</span><input type="color" id="fitColor" value="#1d4ed8" class="cp-native"></div>
-            <div class="f cp-wrap"><span data-i="smoothColorLbl">Silliq çiziq rangi</span><input type="color" id="smoothColor" value="#0d9488" class="cp-native"></div>
+            <div class="style-row sg1"><div class="f cp-wrap"><span data-i="ptColorLbl">Nuqta rangi</span><input type="color" id="ptColor" value="#dc2626" class="cp-native"></div><div class="f cp-wrap"><span data-i="fitColorLbl">Best fit çiziq rangi</span><input type="color" id="fitColor" value="#1d4ed8" class="cp-native"></div><div class="f cp-wrap"><span data-i="smoothColorLbl">Silliq çiziq rangi</span><input type="color" id="smoothColor" value="#0d9488" class="cp-native"></div></div>
+            <div class="style-row sg1"><label class="f"><span><span data-i="ptSizeLbl">Nuqta hajmi</span><b class="rv"></b></span><input type="range" id="ptSize" min="1" max="12" step="0.1" value="4.2"></label><label class="f"><span><span data-i="lnWidthLbl">Çiziq qalinligi</span><b class="rv"></b></span><input type="range" id="lnWidth" min="0.5" max="8" step="0.1" value="2.4"></label></div>
+            <div class="style-row sg2"><div class="f cp-wrap"><span data-i="ptColorLbl">Nuqta rangi</span><input type="color" id="ptColor2" value="#7c3aed" class="cp-native"></div><div class="f cp-wrap"><span data-i="fitColorLbl">Best fit çiziq rangi</span><input type="color" id="fitColor2" value="#ea580c" class="cp-native"></div><div class="f cp-wrap"><span data-i="smoothColorLbl">Silliq çiziq rangi</span><input type="color" id="smoothColor2" value="#db2777" class="cp-native"></div></div>
+            <div class="style-row sg2"><label class="f"><span><span data-i="ptSizeLbl">Nuqta hajmi</span><b class="rv"></b></span><input type="range" id="ptSize2" min="1" max="12" step="0.1" value="4.2"></label><label class="f"><span><span data-i="lnWidthLbl">Çiziq qalinligi</span><b class="rv"></b></span><input type="range" id="lnWidth2" min="0.5" max="8" step="0.1" value="2.4"></label></div>
             <div class="f" style="justify-content:flex-end"><button type="button" class="btn btn-ghost btn-sm" id="btnStyleReset">↺ <span data-i="styleReset">Boşlanğiç körinişga qaytariş</span></button></div>
           </div>
         </details>
@@ -824,6 +850,35 @@ tr.stat-mean td{background:linear-gradient(180deg,#ffeeb4,#ffe28f)!important;col
           </label>
           <div class="varhint" data-i="customFitHint">
             X örnida har doim <b>x</b> işlatiladi. Boşqa har qanday harf (a, b, c, k, m...) — dastur avtomatik topadigan noma'lum parametr hisoblanadi. Ruxsat etilgan amallar va funksiyalar formuladagi kabi: <b>+ − * / ^ ()</b>, <b>sin cos tan sqrt abs ln log10 exp</b>. Özgarmaslar (π, e va h.k.) faqat «Özgarmas kattaliklar» bandida özingiz kiritgandagina işlaydi; e^x uçun <b>exp(x)</b> dan foydalaning.
+          </div>
+        </div>
+        <div class="opt-row" id="series2Row">
+          <span class="opt-label" data-i="series2Label">Shu grafikka ikkinçi boğlaniş qöşiş</span>
+          <label class="sw"><input type="checkbox" id="swSeries2"><span class="sw-state"></span><span class="sw-track"><span class="sw-knob"></span></span></label>
+        </div>
+        <div class="series2-wrap" id="series2Wrap" style="display:none">
+          <div class="s2-title" data-i="series2Title">2-boğlaniş (shu grafikda)</div>
+          <div class="row3">
+            <label class="f"><span data-i="xColLabel2">X öqi (ustun) — 2-boğlaniş</span><select id="xCol2"></select></label>
+            <label class="f"><span data-i="yColLabel2">Y öqi (ustun) — 2-boğlaniş</span><select id="yCol2"></select></label>
+            <label class="f" id="fitTypeWrap2"><span data-i="fitTypeLabel">Approksimatsiya turi</span>
+              <select id="fitType2">
+              <option value="auto" data-i="fitAuto">Avtomatik (eng mosini tanlaydi)</option>
+              <option value="linear" data-i="fitLinear">Çiziqli: y = a + b·x</option>
+              <option value="quad" data-i="fitQuad">Kvadratik: y = a + b·x + c·x²</option>
+              <option value="cubic" data-i="fitCubic">Kubik: y = a + b·x + c·x² + d·x³</option>
+              <option value="power" data-i="fitPower">Darajali: y = a·x^b</option>
+              <option value="exp" data-i="fitExp">Eksponensial: y = a·e^(b·x)</option>
+              <option value="log" data-i="fitLog">Logarifmik: y = a + b·ln(x)</option>
+              <option value="sqrt" data-i="fitSqrt">Kvadrat ildiz: y = a + b·√x</option>
+              <option value="custom" data-i="fitCustom">✏️ Qölda kiritiş (öz formulangiz)</option>
+            </select>
+            </label>
+          </div>
+          <div class="f" id="customFitWrap2" style="display:none">
+            <label class="f"><span data-i="customFitLabel">Formula (x — mustaqil özgaruvçi, a, b, c... — topiladigan parametrlar)</span>
+              <input type="text" id="customFitFormula2" data-i-ph="customFitPh" placeholder="masalan: a + b*x + c*x^2">
+            </label>
           </div>
         </div>
         <button class="btn btn-primary" id="btnPlot">📈 <span data-i="plotBtn">Grafik çiziş</span></button>
@@ -920,7 +975,7 @@ window.xlsxReady = loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0
 const I18N = {
   uz:{
     constInLabel:"Özgarmas (nomi = qiymati)", cInPh:"masalan: c = 3", fInLabel:"Yangi ustun (nomi = formula; LaTeX ham bölaveradi)", fExprPh2:"masalan: I_a = U/R yoki F = m*a", addTableBtn:"Yangi jadval qöşiş", tabRename:"Jadval nomi:", delTableConfirm:"Bu jadval öçirilsinmi?", tabTip:"Tanlaş uçun bosing, nomini özgartiriş uçun ikki marta bosing", tableDefault:"Jadval",chartDefault:"Grafik",navMain:"Asosiy",navChart:"Grafik",ptShowLabel:"Nuqtalarni körsatiş",styleTitle:"Grafik körinişi (nuqta, çiziq, shakl)",shapeLbl:"Grafik shakli",shStd:"Standart",shWide:"Keng (16:9)",shUltra:"Juda keng (7:3)",shSquare:"Kvadrat (1:1)",shTall:"Böyiga (3:4)",ptEveryLbl:"Qaysi nuqtalar körinsin",pe1:"Hammasi",pe2:"Har 2-si",pe3:"Har 3-si",pe5:"Har 5-si",pe10:"Har 10-si",pe20:"Har 20-si",ptSizeLbl:"Nuqta hajmi",ptColorLbl:"Nuqta rangi",lnWidthLbl:"Çiziq qalinligi",fitColorLbl:"Best fit çiziq rangi",smoothColorLbl:"Silliq çiziq rangi",
-    smoothLvlLbl:"Silliqlik darajasi (0 = nuqtalardan aniq ötadi)", shCustom:"Qölda (chetidan sudrab)", peSel:"Qölda tanlanganlar",
+    smoothLvlLbl:"Silliqlik darajasi (0 = nuqtalardan aniq ötadi; oşgan sari tekisroq, lekin nuqtalardan uzoqlaşmaydi)", shCustom:"Qölda (chetidan sudrab)", peSel:"Qölda tanlanganlar",
     ptPickBtn:"Grafikda nuqta tanlaş", ptPickDone:"Tayyor", ptMaxBtn:"Maksimumlar", ptMinBtn:"Minimumlar", ptAllBtn:"Hammasi", ptNoneBtn:"Tozalaş", ptSelCount:"Tanlangan nuqtalar",
     ptPickHint:"«Grafikda nuqta tanlaş» ni yoqing va grafikdagi nuqtaga bosing — nuqta körinadi yoki yashirinadi. Tanlanmagan nuqtalar faqat tanlaş vaqtida xira körinadi, rasmda çiqmaydi. Maksimum/Minimum tugmalari cho'qqi va vodiylarni avtomatik topadi.",
     needPlotFirst:"Avval «Grafik çiziş» tugmasini bosing.", chRzHint:"Grafikning ong yoki past çetini (yoki burçagini) ushlab sudrang — ölçami özgaradi. Boşlanğiç ölçamga qaytariş: çetiga ikki marta bosing.",styleReset:"Boşlanğiç körinişga qaytariş",newTableTitle:"Yangi jadval",newTableName:"Jadval nomi (ixtiyoriy)",rowsLbl:"Qatorlar soni",colsLbl:"Ustunlar soni",createBtn:"Yaratiş",importBtn:"Excel fayldan yuklaş",importOk:"Excel fayl yuklandi",importFail:"Faylni oqib bölmadi",nameTaken:"Bu nom boşqa ustunda band — barça jadvallarda özgaruvçi nomlari takrorlanmasligi kerak.",pickTableTitle:"Qaysi jadvalga qöşilsin?",pickTableDesc:"Formulada bir neçta jadval özgaruvçilari bor. Yangi ustun qaysi jadvalga qöşilsin?",cancelPick:"Bekor qilış", addChartBtn:"Yangi grafik qöşiş", chTableLabel:"Grafik uçun jadval", delChartBtn:"Grafikni öçiriş",
@@ -984,7 +1039,7 @@ const I18N = {
   },
   ru:{
     constInLabel:"Константа (имя = значение)", cInPh:"например: c = 3", fInLabel:"Новый столбец (имя = формула; можно LaTeX)", fExprPh2:"например: I_a = U/R или F = m*a", addTableBtn:"Добавить таблицу", tabRename:"Название таблицы:", delTableConfirm:"Удалить эту таблицу?", tabTip:"Нажмите — выбрать, двойной клик — переименовать", tableDefault:"Таблица",chartDefault:"График",navMain:"Основное",navChart:"График",ptShowLabel:"Показывать точки",styleTitle:"Вид графика (точки, линии, форма)",shapeLbl:"Форма графика",shStd:"Стандартная",shWide:"Широкая (16:9)",shUltra:"Очень широкая (7:3)",shSquare:"Квадрат (1:1)",shTall:"Вертикальная (3:4)",ptEveryLbl:"Какие точки показывать",pe1:"Все",pe2:"Каждая 2-я",pe3:"Каждая 3-я",pe5:"Каждая 5-я",pe10:"Каждая 10-я",pe20:"Каждая 20-я",ptSizeLbl:"Размер точек",ptColorLbl:"Цвет точек",lnWidthLbl:"Толщина линии",fitColorLbl:"Цвет линии best fit",smoothColorLbl:"Цвет плавной линии",
-    smoothLvlLbl:"Степень сглаживания (0 = точно через точки)", shCustom:"Вручную (тянуть за край)", peSel:"Выбранные вручную",
+    smoothLvlLbl:"Степень сглаживания (0 = точно через точки; чем выше, тем глаже, но кривая не уходит далеко от точек)", shCustom:"Вручную (тянуть за край)", peSel:"Выбранные вручную",
     ptPickBtn:"Выбрать точки на графике", ptPickDone:"Готово", ptMaxBtn:"Максимумы", ptMinBtn:"Минимумы", ptAllBtn:"Все", ptNoneBtn:"Очистить", ptSelCount:"Выбрано точек",
     ptPickHint:"Включите «Выбрать точки на графике» и нажимайте на точки — точка появится или скроется. Невыбранные точки видны бледно только в режиме выбора и не попадают в сохранённое изображение. Кнопки максимумов/минимумов находят пики и впадины автоматически.",
     needPlotFirst:"Сначала постройте график.", chRzHint:"Потяните за правый или нижний край (или угол) графика, чтобы изменить размер. Двойной клик по краю — вернуть исходный размер.",styleReset:"Вернуть вид по умолчанию",newTableTitle:"Новая таблица",newTableName:"Название таблицы (необязательно)",rowsLbl:"Число строк",colsLbl:"Число столбцов",createBtn:"Создать",importBtn:"Загрузить из Excel",importOk:"Файл Excel загружен",importFail:"Не удалось прочитать файл",nameTaken:"Это имя уже занято в другом столбце.",pickTableTitle:"В какую таблицу добавить?",pickTableDesc:"В формуле переменные из нескольких таблиц. Куда добавить новый столбец?",cancelPick:"Отмена", addChartBtn:"Добавить график", chTableLabel:"Таблица для графика", delChartBtn:"Удалить график",
@@ -1049,7 +1104,7 @@ const I18N = {
   },
   en:{
     constInLabel:"Constant (name = value)", cInPh:"e.g. c = 3", fInLabel:"New column (name = formula; LaTeX allowed)", fExprPh2:"e.g. I_a = U/R or F = m*a", addTableBtn:"Add table", tabRename:"Table name:", delTableConfirm:"Delete this table?", tabTip:"Click to select, double-click to rename", tableDefault:"Table",chartDefault:"Chart",navMain:"Main",navChart:"Chart",ptShowLabel:"Show points",styleTitle:"Chart look (points, lines, shape)",shapeLbl:"Chart shape",shStd:"Standard",shWide:"Wide (16:9)",shUltra:"Extra wide (7:3)",shSquare:"Square (1:1)",shTall:"Tall (3:4)",ptEveryLbl:"Which points to show",pe1:"All",pe2:"Every 2nd",pe3:"Every 3rd",pe5:"Every 5th",pe10:"Every 10th",pe20:"Every 20th",ptSizeLbl:"Point size",ptColorLbl:"Point color",lnWidthLbl:"Line width",fitColorLbl:"Best-fit line color",smoothColorLbl:"Smooth line color",
-    smoothLvlLbl:"Smoothing level (0 = passes exactly through the points)", shCustom:"Manual (drag the edge)", peSel:"Manually selected",
+    smoothLvlLbl:"Smoothing level (0 = passes exactly through the points; higher = smoother, but the curve stays close to the points)", shCustom:"Manual (drag the edge)", peSel:"Manually selected",
     ptPickBtn:"Pick points on the chart", ptPickDone:"Done", ptMaxBtn:"Maxima", ptMinBtn:"Minima", ptAllBtn:"All", ptNoneBtn:"Clear", ptSelCount:"Selected points",
     ptPickHint:"Turn on “Pick points on the chart” and click a point to show or hide it. Unselected points appear faintly only while picking and are not included in the saved image. The Maxima/Minima buttons find peaks and valleys automatically.",
     needPlotFirst:"Plot the chart first.", chRzHint:"Drag the right or bottom edge (or the corner) of the chart to resize it. Double-click an edge to restore the default size.",styleReset:"Reset to default look",newTableTitle:"New table",newTableName:"Table name (optional)",rowsLbl:"Number of rows",colsLbl:"Number of columns",createBtn:"Create",importBtn:"Load from Excel",importOk:"Excel file loaded",importFail:"Could not read the file",nameTaken:"This name is already used by another column.",pickTableTitle:"Add to which table?",pickTableDesc:"The formula uses variables from several tables. Which table gets the new column?",cancelPick:"Cancel", addChartBtn:"Add chart", chTableLabel:"Table for chart", delChartBtn:"Delete chart",
@@ -1121,7 +1176,7 @@ const I18N_EXTRA = {
     constOnlyHint:"faqat özingiz kiritgan özgarmaslar",
     unitPh:"birlik", unitTitle:"Birlik (grafik öqida körinadi), masalan: V, m/s, μm",
     xUnitLabel:"X öqi birligi", yUnitLabel:"Y öqi birligi", unitEgPh:"masalan: V, m/s, μm",
-    smoothLabel:"Nuqtalarni silliq çiziq bilan tutaştiriş", legendSmooth:"Tutaştiruvçi çiziq",
+    series2Label:"Shu grafikka ikkinçi boğlaniş qöşiş", series2Title:"2-boğlaniş (shu grafikda)", xColLabel2:"X öqi (ustun) — 2-boğlaniş", yColLabel2:"Y öqi (ustun) — 2-boğlaniş", styleSeriesLbl:"Qaysi boğlanişning körinişi sozlansin", styleSeries1:"1-boğlaniş", styleSeries2:"2-boğlaniş", smoothLabel:"Nuqtalarni silliq çiziq bilan tutaştiriş", legendSmooth:"Tutaştiruvçi çiziq",
     legendSetTitle:"Legend sozlamalari", legShowLabel:"Legendni körsatiş",
     legDataLabel:"Nuqtalar yozuvi", legFitLabel:"Best fit çiziği yozuvi", legSmoothLabel:"Tutaştiruvçi çiziq yozuvi",
     legPosLabel:"Legend joyi", legPosAuto:"Avtomatik (yuqori çap)", legPosTL:"Yuqori çap", legPosTR:"Yuqori öng",
@@ -1133,7 +1188,7 @@ const I18N_EXTRA = {
     constOnlyHint:"только заданные вами константы",
     unitPh:"ед.", unitTitle:"Единица измерения (показывается на оси графика), например: V, m/s, μm",
     xUnitLabel:"Единица оси X", yUnitLabel:"Единица оси Y", unitEgPh:"например: V, m/s, μm",
-    smoothLabel:"Соединить точки плавной линией", legendSmooth:"Соединяющая линия",
+    series2Label:"Добавить на этот график вторую зависимость", series2Title:"2-я зависимость (на этом графике)", xColLabel2:"Ось X (столбец) — 2-я зависимость", yColLabel2:"Ось Y (столбец) — 2-я зависимость", styleSeriesLbl:"Для какой зависимости настраивать вид", styleSeries1:"1-я зависимость", styleSeries2:"2-я зависимость", smoothLabel:"Соединить точки плавной линией", legendSmooth:"Соединяющая линия",
     legendSetTitle:"Настройки легенды", legShowLabel:"Показывать легенду",
     legDataLabel:"Подпись точек", legFitLabel:"Подпись линии best fit", legSmoothLabel:"Подпись соединяющей линии",
     legPosLabel:"Положение легенды", legPosAuto:"Авто (вверху слева)", legPosTL:"Вверху слева", legPosTR:"Вверху справа",
@@ -1145,7 +1200,7 @@ const I18N_EXTRA = {
     constOnlyHint:"only the constants you define",
     unitPh:"unit", unitTitle:"Unit (shown on the chart axis), e.g. V, m/s, μm",
     xUnitLabel:"X axis unit", yUnitLabel:"Y axis unit", unitEgPh:"e.g. V, m/s, μm",
-    smoothLabel:"Connect points with a smooth line", legendSmooth:"Connecting line",
+    series2Label:"Add a second relation to this chart", series2Title:"2nd relation (on this chart)", xColLabel2:"X axis (column) — 2nd relation", yColLabel2:"Y axis (column) — 2nd relation", styleSeriesLbl:"Which relation's look to adjust", styleSeries1:"1st relation", styleSeries2:"2nd relation", smoothLabel:"Connect points with a smooth line", legendSmooth:"Connecting line",
     legendSetTitle:"Legend settings", legShowLabel:"Show legend",
     legDataLabel:"Points label", legFitLabel:"Best-fit line label", legSmoothLabel:"Connecting line label",
     legPosLabel:"Legend position", legPosAuto:"Auto (top left)", legPosTL:"Top left", legPosTR:"Top right",
@@ -1764,11 +1819,12 @@ function chartStyle(){
   const g=(id,d)=>{ const el=CQ(id); return el?el.value:d; };
   const num=(v,d,a,b)=>{ v=parseFloat(v); return isFinite(v)?Math.min(b,Math.max(a,v)):d; };
   return {pts:CQ('swPoints')?CQ('swPoints').checked:true, every:Math.max(1,parseInt(g('ptEvery','1'))||1), sel:g('ptEvery','1')==='sel', size:num(g('ptSize','4.2'),4.2,0.5,14),
-    ptColor:g('ptColor','#dc2626'), lw:num(g('lnWidth','2.4'),2.4,0.5,10), fitColor:g('fitColor','#1d4ed8'), smoothColor:g('smoothColor','#0d9488')};
+    ptColor:g('ptColor','#dc2626'), lw:num(g('lnWidth','2.4'),2.4,0.5,10), fitColor:g('fitColor','#1d4ed8'), smoothColor:g('smoothColor','#0d9488'),
+    size2:num(g('ptSize2','4.2'),4.2,0.5,14), ptColor2:g('ptColor2','#7c3aed'), lw2:num(g('lnWidth2','2.4'),2.4,0.5,10), fitColor2:g('fitColor2','#ea580c'), smoothColor2:g('smoothColor2','#db2777')};
 }
-const CH_STYLE_IDS=['chShape','ptEvery','ptSize','ptColor','lnWidth','fitColor','smoothColor','smoothLvl','chW','chH','ptSel','gridX','gridY','ptLegVals','extraX'];
-const CH_STYLE_DEF={chShape:'std',ptEvery:'1',ptSize:'4.2',ptColor:'#dc2626',lnWidth:'2.4',fitColor:'#1d4ed8',smoothColor:'#0d9488',smoothLvl:'3',chW:'',chH:'',ptSel:'',gridX:'',gridY:'',ptLegVals:'none',extraX:''};
-function updRv(){ ['ptSize','lnWidth','smoothLvl'].forEach(id=>{ const el=CQ(id); if(!el) return; const b=el.closest('label').querySelector('.rv'); if(b) b.textContent=el.value; }); try{ syncPalettes(); }catch(e){} }
+const CH_STYLE_IDS=['chShape','ptEvery','ptSize','ptColor','lnWidth','fitColor','smoothColor','ptSize2','ptColor2','lnWidth2','fitColor2','smoothColor2','smoothLvl','chW','chH','ptSel','gridX','gridY','ptLegVals','extraX'];
+const CH_STYLE_DEF={chShape:'std',ptEvery:'1',ptSize:'4.2',ptColor:'#dc2626',lnWidth:'2.4',fitColor:'#1d4ed8',smoothColor:'#0d9488',ptSize2:'4.2',ptColor2:'#7c3aed',lnWidth2:'2.4',fitColor2:'#ea580c',smoothColor2:'#db2777',smoothLvl:'3',chW:'',chH:'',ptSel:'',gridX:'',gridY:'',ptLegVals:'none',extraX:''};
+function updRv(){ ['ptSize','lnWidth','ptSize2','lnWidth2','smoothLvl'].forEach(id=>{ const el=CQ(id); if(!el) return; const b=el.closest('label').querySelector('.rv'); if(b) b.textContent=el.value; }); try{ syncPalettes(); }catch(e){} }
 function bindChartStyle(){
   const redo=()=>{ updRv(); if(lastFit) drawChart(); };
   ['swPoints'].concat(CH_STYLE_IDS).forEach(id=>{ const el=CQ(id); el.addEventListener('input',redo); el.addEventListener('change',redo); });
@@ -1806,8 +1862,8 @@ function initPages(){
 }
 function chartSnapshots(){
   const a=ACT;
-  const out=charts.map(ch=>{ activate(ch); return {name:ch.name||'',table:CQ('chTable').value,x:CQ('xCol').value,y:CQ('yCol').value,fit:CQ('fitType').value,custom:CQ('customFitFormula').value,
-    sw:{swBestFit:CQ('swBestFit').checked,swSmooth:CQ('swSmooth').checked,swLegend:CQ('swLegend').checked,swPoints:CQ('swPoints').checked},st:Object.fromEntries(CH_STYLE_IDS.map(k=>[k,CQ(k).value])),plotted:!!lastFit,ui:chartUI,leg:legendState}; });
+  const out=charts.map(ch=>{ activate(ch); return {name:ch.name||'',table:CQ('chTable').value,x:CQ('xCol').value,y:CQ('yCol').value,fit:CQ('fitType').value,custom:CQ('customFitFormula').value,x2:CQ('xCol2').value,y2:CQ('yCol2').value,fit2:CQ('fitType2').value,custom2:CQ('customFitFormula2').value,
+    sw:{swSeries2:CQ('swSeries2').checked,swBestFit:CQ('swBestFit').checked,swSmooth:CQ('swSmooth').checked,swLegend:CQ('swLegend').checked,swPoints:CQ('swPoints').checked},st:Object.fromEntries(CH_STYLE_IDS.map(k=>[k,CQ(k).value])),plotted:!!lastFit,ui:chartUI,leg:legendState}; });
   if(a) activate(a); return out;
 }
 function restoreCharts(list,idMap){
@@ -1819,8 +1875,10 @@ function restoreCharts(list,idMap){
     showChart(ch); ch.name=cs.name||''; if(!firstShown) firstShown=ch;
     CQ('chTable').value=tid; renderColSelects();
     if(idMap[cs.x]) CQ('xCol').value=idMap[cs.x]; if(idMap[cs.y]) CQ('yCol').value=idMap[cs.y];
-    if(cs.fit) CQ('fitType').value=cs.fit; updateFitControlsVisibility(); CQ('customFitFormula').value=cs.custom||'';
-    Object.keys(cs.sw||{}).forEach(id=>{ const el=CQ(id); if(el) el.checked=!!cs.sw[id]; }); syncSwitches();
+    if(cs.fit) CQ('fitType').value=cs.fit; CQ('customFitFormula').value=cs.custom||'';
+    if(cs.x2 && idMap[cs.x2]) CQ('xCol2').value=idMap[cs.x2]; if(cs.y2 && idMap[cs.y2]) CQ('yCol2').value=idMap[cs.y2];
+    if(cs.fit2) CQ('fitType2').value=cs.fit2; CQ('customFitFormula2').value=cs.custom2||''; updateFitControlsVisibility();
+    Object.keys(cs.sw||{}).forEach(id=>{ const el=CQ(id); if(el) el.checked=!!cs.sw[id]; }); syncSwitches(); try{ syncSeries2UI(); }catch(e){}
     Object.keys(cs.st||{}).forEach(k=>{ const el=CQ(k); if(el) el.value=cs.st[k]; }); updRv();
     if(cs.plotted){ CQ('btnPlot').click(); chartUI=Object.assign({},chartUI,cs.ui||{}); legendState=Object.assign({},legendState,cs.leg||{}); try{ drawChart(); }catch(e){} }
   });
@@ -1875,7 +1933,7 @@ function renderChartTabs(){
 /* ═══ BIR NEÇTA GRAFIK (har birining öz holati; faol grafikka almaştirilib işlanadi) ═══ */
 let charts=[], ACT=null; const CHBIND=[];
 CHBIND.push(()=>bindChartStyle());
-const CH_IDS=['swPoints','chShape','ptEvery','ptSize','ptColor','lnWidth','fitColor','smoothColor','btnStyleReset','swBestFit','fitCanvas','fitType','btnSaveImg','swSmooth','chartTitleHint','chartHover','fitTypeWrap','customFitWrap','fitEq','fitStats','btnPlot','xCol','yCol','customFitFormula','swLegend','chartMsg','chartStage','chTable','btnDelChart','smoothLvl','smoothLvlRow','ptTools','ptSel','ptSelCount','btnPtPick','btnPtMax','btnPtMin','btnPtAll','btnPtNone','chW','chH','chRzE','chRzS','chRzSE','gridX','gridY','ptLegVals','fitOverlay','extraX','btnPtAdd','btnExtraClear','btnLegRestore'];
+const CH_IDS=['swPoints','chShape','ptEvery','ptSize','ptColor','lnWidth','fitColor','smoothColor','btnStyleReset','swBestFit','fitCanvas','fitType','btnSaveImg','swSmooth','chartTitleHint','chartHover','fitTypeWrap','customFitWrap','fitEq','fitStats','btnPlot','xCol','yCol','customFitFormula','swLegend','chartMsg','chartStage','chTable','btnDelChart','smoothLvl','smoothLvlRow','ptTools','ptSel','ptSelCount','swSeries2','series2Wrap','xCol2','yCol2','fitType2','fitTypeWrap2','customFitWrap2','customFitFormula2','styleSeriesWrap','styleSeries1','styleSeries2','ptSize2','ptColor2','lnWidth2','fitColor2','smoothColor2','btnPtPick','btnPtMax','btnPtMin','btnPtAll','btnPtNone','chW','chH','chRzE','chRzS','chRzSE','gridX','gridY','ptLegVals','fitOverlay','extraX','btnPtAdd','btnExtraClear','btnLegRestore'];
 function newChartState(){ return {lastFit:null, chartUI:{title:'',xOv:null,yOv:null,legData:'',legFit:'',legSmooth:'',regions:{},legRows:[],legDefaults:{}}, legendState:{pos:null,preset:'auto'}, legendRect:null, chartEditor:null}; }
 function activate(ch){
   if(ACT===ch) return;
@@ -2507,6 +2565,13 @@ function renderColSelects(){
     tc.forEach(c=>{ [xs,ys].forEach(s=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.header; s.appendChild(o); }); });
     if(tc.some(c=>c.id===prevX)) xs.value=prevX;
     if(tc.some(c=>c.id===prevY)) ys.value=prevY; else if(tc.length>1) ys.value=tc[1].id;
+    const x2=CQ('xCol2'), y2=CQ('yCol2');
+    if(x2 && y2){
+      const pX2=x2.value, pY2=y2.value; x2.innerHTML=''; y2.innerHTML='';
+      tc.forEach(c=>{ [x2,y2].forEach(sl=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.header; sl.appendChild(o); }); });
+      x2.value = tc.some(c=>c.id===pX2) ? pX2 : (tc[0]?tc[0].id:'');
+      y2.value = tc.some(c=>c.id===pY2) ? pY2 : (tc.length>2 ? tc[2].id : (tc.length>1 ? tc[1].id : ''));
+    }
   }); if(_a) activate(_a);
 
   // statCol — faqat sonli qiymat beradigan ustunlar (data, formula, qator o'rtachasi)
@@ -3272,8 +3337,39 @@ function updateFitControlsVisibility(){
   const ftw=CQ('fitTypeWrap'); if(ftw) ftw.style.display = on ? '' : 'none';
   const cw=CQ('customFitWrap');
   if(cw) cw.style.display = (on && CQ('fitType').value==='custom') ? 'block' : 'none';
+  const ftw2=CQ('fitTypeWrap2'); if(ftw2) ftw2.style.display = on ? '' : 'none';
+  const cw2=CQ('customFitWrap2'); if(cw2) cw2.style.display = (on && CQ('fitType2').value==='custom') ? 'block' : 'none';
 }
 CHBIND.push(()=>CQ('fitType').addEventListener('change', updateFitControlsVisibility));
+CHBIND.push(()=>CQ('fitType2').addEventListener('change', updateFitControlsVisibility));
+
+/* ═══ IKKINÇI BOĞLANIŞ: bitta grafikda 2 ta boğlaniş ═══ */
+function activeS2(){ return (lastFit && lastFit.s2 && CQ('swSeries2') && CQ('swSeries2').checked) ? lastFit.s2 : null; }
+function setStyleSeries(k){
+  if(!ACT) return; ACT.root.dataset.sty = (k==='2' && CQ('swSeries2') && CQ('swSeries2').checked) ? '2' : '1';
+  const cur=ACT.root.dataset.sty;
+  CQ('styleSeries1').classList.toggle('on',cur==='1'); CQ('styleSeries2').classList.toggle('on',cur==='2');
+  try{ syncPalettes(); }catch(e){}
+}
+function syncSeries2UI(){
+  if(!ACT || !CQ('swSeries2')) return;
+  const on=CQ('swSeries2').checked;
+  CQ('series2Wrap').style.display = on ? '' : 'none';
+  CQ('styleSeriesWrap').style.display = on ? '' : 'none';
+  setStyleSeries(on ? (ACT.root.dataset.sty||'1') : '1');
+  updateFitControlsVisibility();
+}
+CHBIND.push(()=>{
+  CQ('styleSeries1').addEventListener('click',()=>setStyleSeries('1'));
+  CQ('styleSeries2').addEventListener('click',()=>setStyleSeries('2'));
+  CQ('swSeries2').addEventListener('change',()=>{
+    syncSeries2UI();
+    if(!lastFit) return;
+    if(CQ('swSeries2').checked) CQ('btnPlot').click();      // yoqilganda ikkinçi boğlanişni ham hisoblab çizadi
+    else drawChart();
+  });
+  ['xCol2','yCol2','fitType2','customFitFormula2'].forEach(id=>CQ(id).addEventListener('change',()=>{ if(lastFit && CQ('swSeries2').checked) CQ('btnPlot').click(); }));
+});
 
 // Grafik ostidagi tenglama/statistika va chizmani joriy holatga moslab yangilaydi
 function refreshChartUI(){
@@ -3283,6 +3379,10 @@ function refreshChartUI(){
     try{ lastFit.fit=computeFit(lastFit.xs, lastFit.ys, lastFit.fitType, lastFit.customFormula); }
     catch(e){ lastFit.fitFailed=true; setChartMsg(t('fitFailedNote')+' '+e.message, 'err'); }
   }
+  if(sw.checked && lastFit.s2 && !lastFit.s2.fit && !lastFit.s2.fitFailed){
+    try{ lastFit.s2.fit=computeFit(lastFit.s2.xs, lastFit.s2.ys, lastFit.s2.fitType, lastFit.s2.customFormula); }
+    catch(e){ lastFit.s2.fitFailed=true; setChartMsg(t('fitFailedNote')+' '+e.message, 'err'); }
+  }
   if(sw.checked && lastFit.fit && lastFit.fit.unknownConsts && lastFit.fit.unknownConsts.length){
     setChartMsg(t('customPiWarn').replace('{n}', lastFit.fit.unknownConsts.join(', ')), 'warn');
   } else if(sw.checked && lastFit.fit && lastFit.fit.degenerate){
@@ -3291,22 +3391,22 @@ function refreshChartUI(){
     setChartMsg('');
   }
   drawChart();
-  const showFit = sw.checked && !!lastFit.fit;
   const eqEl=CQ('fitEq');
   const stEl=CQ('fitStats');
-  const n=lastFit.xs.length;
-  if(showFit){
-    const fit=lastFit.fit;
-    eqEl.style.display='block';
-    const usedLabel = fit.auto ? ` — ${fitTypeLabel(fit.type)} ${t('autoUsed')}` : '';
-    eqEl.textContent = `${fit.equation}   (R² = ${fit.r2.toFixed(4)})${usedLabel}`;
-    stEl.innerHTML =
-      `<div class="fit-stat">n = <b>${fit.n}</b></div>
-       <div class="fit-stat">R² = <b>${fit.r2.toFixed(4)}</b></div>`;
-  } else {
-    eqEl.style.display='none'; eqEl.textContent='';
-    stEl.innerHTML = `<div class="fit-stat">n = <b>${n}</b></div>`;
-  }
+  const sers=[lastFit]; const S2a=activeS2(); if(S2a) sers.push(S2a);
+  const eqL=[], stH=[];
+  sers.forEach((S,k)=>{
+    const pre = sers.length>1 ? (k+1)+') ' : '';
+    const f = (sw.checked && S.fit) ? S.fit : null;
+    if(f){
+      const usedLabel = f.auto ? ` — ${fitTypeLabel(f.type)} ${t('autoUsed')}` : '';
+      eqL.push(pre+`${f.equation}   (R² = ${f.r2.toFixed(4)})${usedLabel}`);
+      stH.push(`<div class="fit-stat">${pre}n = <b>${f.n}</b></div><div class="fit-stat">R² = <b>${f.r2.toFixed(4)}</b></div>`);
+    } else stH.push(`<div class="fit-stat">${pre}n = <b>${S.xs.length}</b></div>`);
+  });
+  if(eqL.length){ eqEl.style.display='block'; eqEl.style.whiteSpace='pre-line'; eqEl.textContent=eqL.join('\n'); }
+  else { eqEl.style.display='none'; eqEl.textContent=''; }
+  stEl.innerHTML=stH.join('');
 }
 
 CHBIND.push(()=>CQ('btnPlot').addEventListener('click',()=>{
@@ -3326,10 +3426,24 @@ CHBIND.push(()=>CQ('btnPlot').addEventListener('click',()=>{
   if(CQ('swBestFit').checked){
     try{ fit=computeFit(xs, ys, fitType, customFormula); }catch(e){ fitErr=e; }
   }
-  setChartMsg(fitErr ? (t('fitFailedNote')+' '+fitErr.message) : '', 'err');
+  // ── ikkinçi boğlaniş (ixtiyoriy) ──
+  let s2=null, fitErr2=null;
+  if(CQ('swSeries2').checked){
+    const xid2=CQ('xCol2').value, yid2=CQ('yCol2').value;
+    if(!xid2||!yid2||xid2===yid2){ setChartMsg(t('diffCols'), 'err'); return; }
+    const _tv2=withTab(CQ('chTable').value,()=>[colValues(xid2),colValues(yid2)]);
+    const pts2=[];
+    for(let i=0;i<Math.min(_tv2[0].length,_tv2[1].length);i++){ if(!isNaN(_tv2[0][i]) && !isNaN(_tv2[1][i])) pts2.push([_tv2[0][i],_tv2[1][i]]); }
+    if(pts2.length<2){ setChartMsg(t('needPoints'), 'err'); return; }
+    const xs2=pts2.map(q=>q[0]), ys2=pts2.map(q=>q[1]), fitType2=CQ('fitType2').value, customFormula2=CQ('customFitFormula2').value;
+    let fit2=null;
+    if(CQ('swBestFit').checked){ try{ fit2=computeFit(xs2, ys2, fitType2, customFormula2); }catch(e){ fitErr2=e; } }
+    s2={xs:xs2,ys:ys2,fit:fit2,fitType:fitType2,customFormula:customFormula2,fitFailed:!!fitErr2,xid:xid2,yid:yid2,xLabel:axisLabel(findCol(xid2)),yLabel:axisLabel(findCol(yid2))};
+  }
+  setChartMsg((fitErr||fitErr2) ? (t('fitFailedNote')+' '+(fitErr?fitErr.message:fitErr2.message)) : '', 'err');
   if(lastFit && lastFit.xid!==xid) chartUI.xOv=null;
   if(lastFit && lastFit.yid!==yid) chartUI.yOv=null;
-  lastFit={xs,ys,fit,fitType,customFormula,fitFailed:!!fitErr,xid,yid,xLabel:axisLabel(findCol(xid)),yLabel:axisLabel(findCol(yid))};
+  lastFit={xs,ys,fit,fitType,customFormula,fitFailed:!!fitErr,xid,yid,xLabel:axisLabel(findCol(xid)),yLabel:axisLabel(findCol(yid)),s2};
   refreshChartUI();
   CQ('btnSaveImg').style.display='inline-flex';
 }));
@@ -3351,7 +3465,10 @@ function shortFitName(type){
 function drawChart(){
   if(!lastFit) return;
   const {xs,ys,fit}=lastFit;
+  const S2=activeS2(); if(!S2) lastFit.ptPos2=null;
+  const showFit2=!!(S2 && S2.fit && CQ('swBestFit').checked);
   const cxo=findCol(lastFit.xid), cyo=findCol(lastFit.yid);
+  const cxo2=S2?findCol(S2.xid):null, cyo2=S2?findCol(S2.yid):null;
   const xLabel=cxo?axisLabel(cxo):lastFit.xLabel, yLabel=cyo?axisLabel(cyo):lastFit.yLabel;
   refreshLegendPlaceholders(fit);
   const showFit = !!fit && CQ('swBestFit').checked;
@@ -3381,8 +3498,9 @@ function drawChart(){
     { const rw=Math.max(TL.w+12,140); chartUI.regions.title={x:W/2-rw/2, y:36-TL.a-4, w:rw, h:TL.a+TL.d+8}; }
   }
 
-  const xmin=Math.min(...xs), xmax=Math.max(...xs);
-  const ymin=Math.min(...ys), ymax=Math.max(...ys);
+  const axs=S2?xs.concat(S2.xs):xs, ays=S2?ys.concat(S2.ys):ys;
+  const xmin=Math.min(...axs), xmax=Math.max(...axs);
+  const ymin=Math.min(...ays), ymax=Math.max(...ays);
   const xr=(xmax-xmin)||Math.abs(xmax)||1, yr=(ymax-ymin)||Math.abs(ymax)||1;
   const xPad=xr*0.12, yPad=yr*0.12;
   const X0=xmin-xPad, X1=xmax+xPad, Y0=ymin-yPad, Y1=ymax+yPad;
@@ -3453,12 +3571,12 @@ function drawChart(){
 
   // ── O'Q NOMLARI (rasm tarkibida) ──
   ctx.fillStyle='#0f172a'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  const axisRoot=(c, fallback, ov, n)=> buildAxisRoot(latexToGreek(ov!==null && ov!==undefined ? ov : autoAxisRaw(c, fallback, n)));
-  const XL = layoutRichRoot(ctx, axisRoot(cxo, lastFit.xLabel, chartUI.xOv, chartUI.xExp), 13, W-padL-padR, 8, true);
+  const axisRoot=(isX, ov, n)=> buildAxisRoot(latexToGreek(ov!==null && ov!==undefined ? ov : autoAxisRawFor(isX, n)));
+  const XL = layoutRichRoot(ctx, axisRoot(true, chartUI.xOv, chartUI.xExp), 13, W-padL-padR, 8, true);
   const xBase = Math.min(H-12, H-4-XL.d), xLeft = (padL+W-padR)/2 - XL.w/2;
   XL.draw(xLeft, xBase);
   { const rw=Math.max(XL.w+12,110); chartUI.regions.x={x:(padL+W-padR)/2-rw/2, y:xBase-Math.max(XL.a,12)-4, w:rw, h:Math.max(XL.a,12)+Math.max(XL.d,6)+8}; }
-  const YL = layoutRichRoot(ctx, axisRoot(cyo, lastFit.yLabel, chartUI.yOv, chartUI.yExp), 13, H-pad-padT, 8, true);
+  const YL = layoutRichRoot(ctx, axisRoot(false, chartUI.yOv, chartUI.yExp), 13, H-pad-padT, 8, true);
   const yBaseX = Math.max(17, 4+YL.a), yCy = (padT+H-pad)/2;
   ctx.save(); ctx.translate(yBaseX, yCy); ctx.rotate(-Math.PI/2);
   YL.draw(-YL.w/2, 0); ctx.restore();
@@ -3466,6 +3584,7 @@ function drawChart(){
 
   const showSmooth = !!(CQ('swSmooth') && CQ('swSmooth').checked);
   const sty=chartStyle();
+  const fit2v=x=>S2&&S2.fit?S2.fit.predict(x):NaN;
   ctx.save(); ctx.beginPath(); ctx.rect(padL, padT, W-padL-padR, H-pad-padT); ctx.clip();   // egri chiziq grafikdan tashqariga chiqmasin
 
   // silliq tutashtiruvchi chiziq (Best Fit'ga bog'liq emas)
@@ -3496,6 +3615,28 @@ function drawChart(){
     ctx.stroke();
   }
 
+  // ── 2-boğlaniş: silliq çiziq va best fit ──
+  if(S2){
+    if(showSmooth){
+      const sp2=smoothCurve(S2.xs,S2.ys);
+      if(sp2 && sp2.length>1){
+        ctx.strokeStyle=sty.smoothColor2; ctx.lineWidth=sty.lw2; ctx.lineJoin='round'; ctx.lineCap='round';
+        ctx.beginPath(); sp2.forEach((q,i)=>{ const px=sx(q[0]), py=sy(q[1]); if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+        ctx.stroke(); ctx.lineJoin='miter'; ctx.lineCap='butt';
+      }
+    }
+    if(showFit2){
+      ctx.strokeStyle=sty.fitColor2; ctx.lineWidth=sty.lw2; ctx.beginPath();
+      let st2=false;
+      for(let i=0;i<=140;i++){
+        const xv=X0+(X1-X0)*i/140, yv=fit2v(xv);
+        if(!isFinite(yv)){ st2=false; continue; }
+        const px=sx(xv), py=sy(yv); if(!st2){ ctx.moveTo(px,py); st2=true; } else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    }
+  }
+
   ctx.restore();
 
   lastFit.geom={padL,padR,padT,padB:pad,W,H,X0,X1,Y0,Y1};
@@ -3517,6 +3658,15 @@ function drawChart(){
     if(ghost && lastFit.hoverIdx>=0 && lastFit.ptPos[lastFit.hoverIdx]){
       const [px,py]=lastFit.ptPos[lastFit.hoverIdx];
       ctx.strokeStyle=sty.ptColor; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(px,py,sty.size+4,0,Math.PI*2); ctx.stroke();
+    }
+  }
+
+  if(S2){
+    lastFit.ptPos2 = S2.xs.map((x,i)=>[sx(x), sy(S2.ys[i]), i]);
+    if(sty.pts){
+      const ev2=sty.sel?1:sty.every;
+      ctx.fillStyle=sty.ptColor2;
+      lastFit.ptPos2.forEach(([px,py,i])=>{ if(i%ev2!==0) return; ctx.beginPath(); ctx.arc(px,py,sty.size2,0,Math.PI*2); ctx.fill(); });
     }
   }
 
@@ -3543,14 +3693,23 @@ function drawChart(){
   if(sty.pts) lastFit.extraPts.forEach(q=>legPts.push({x:q.x,y:q.y,ex:true}));     // qöşilgan nuqtalar ham oddiy nuqtalar qatorida
   const showSelVals=(lvMode==='x'||lvMode==='y'||lvMode==='xy') && legPts.length>0;
   const legHid=chartUI.legHidden||{};
-  const legAny=(showFit&&!legHid.legFit)||(showSmooth&&!legHid.legSmooth)||(showSelVals&&!legHid.legSel)||(sty.pts&&!legHid.legData&&(legHid.legFit||legHid.legSmooth||legHid.legSel));
-  lastFit.legRestoreNeeded=!!(legOn && (showFit||showSmooth||showSelVals) && !legAny);
+  const legAny=(showFit&&!legHid.legFit)||(showSmooth&&!legHid.legSmooth)||(showSelVals&&!legHid.legSel)||(sty.pts&&!legHid.legData&&(legHid.legFit||legHid.legSmooth||legHid.legSel))
+    ||(showFit2&&!legHid.legFit2)||(showSmooth&&S2&&!legHid.legSmooth2)||(!!S2&&sty.pts&&(!legHid.legData||!legHid.legData2));
+  lastFit.legRestoreNeeded=!!(legOn && (showFit||showSmooth||showSelVals||!!S2) && !legAny);
   if(legOn && legAny){
     const lv=k=>latexToGreek((chartUI[k]||'').trim());
-    chartUI.legDefaults={legData:t('legendData'), legFit:(fit?fit.equation:''), legSmooth:t('legendSmooth')};
-    const legendItems=[]; if(sty.pts && !legHid.legData) legendItems.push({key:'legData', kind:'point', color:sty.ptColor, label:lv('legData')||t('legendData')});
+    const hdr=c=>c?latexToGreek(c.header):'';
+    const dataDef1 = S2 ? (hdr(cyo)+'('+hdr(cxo)+')') : t('legendData');
+    const dataDef2 = S2 ? (hdr(cyo2)+'('+hdr(cxo2)+')') : '';
+    chartUI.legDefaults={legData:dataDef1, legFit:(fit?fit.equation:''), legSmooth:t('legendSmooth'), legData2:dataDef2, legFit2:(S2&&S2.fit?S2.fit.equation:''), legSmooth2:t('legendSmooth')+' (2)'};
+    const legendItems=[]; if(sty.pts && !legHid.legData) legendItems.push({key:'legData', kind:'point', color:sty.ptColor, label:lv('legData')||dataDef1});
     if(showFit && !legHid.legFit) legendItems.push({key:'legFit', kind:'line', color:sty.fitColor, label:lv('legFit')||fit.equation.replace(/\s{3}\(/,'\n(')});
     if(showSmooth && !legHid.legSmooth) legendItems.push({key:'legSmooth', kind:'line', color:sty.smoothColor, label:lv('legSmooth')||t('legendSmooth')});
+    if(S2){
+      if(sty.pts && !legHid.legData2) legendItems.push({key:'legData2', kind:'point', color:sty.ptColor2, label:lv('legData2')||dataDef2});
+      if(showFit2 && !legHid.legFit2) legendItems.push({key:'legFit2', kind:'line', color:sty.fitColor2, label:lv('legFit2')||S2.fit.equation.replace(/\s{3}\(/,'\n(')});
+      if(showSmooth && !legHid.legSmooth2) legendItems.push({key:'legSmooth2', kind:'line', color:sty.smoothColor2, label:lv('legSmooth2')||(t('legendSmooth')+' (2)')});
+    }
     if(showSelVals && !legHid.legSel){
       const nx=cxo?latexToGreek(cxo.header):'X', ny=cyo?latexToGreek(cyo.header):'Y';
       const cap=36, byX=(p,q)=>p.x-q.x; let pts=legPts.slice().sort(byX);
@@ -3585,6 +3744,7 @@ function drawChart(){
       if(!corners[pr]){
         // avtomatik joy: nuqtalar va egri chiziqni eng kam yopadigan burchak
         const pts=xs.map((x,i)=>[sx(x), sy(ys[i])]);
+        if(S2) S2.xs.forEach((x,i)=>pts.push([sx(x), sy(S2.ys[i])]));
         if(showFit && fit){ for(let i=0;i<=60;i++){ const xv=X0+(X1-X0)*i/60, yv=fit.predict(xv); if(isFinite(yv)) pts.push([sx(xv), sy(yv)]); } }
         if(showSmooth){ const sp=smoothCurve(xs,ys); if(sp) sp.forEach((q,i)=>{ if(i%3===0) pts.push([sx(q[0]), sy(q[1])]); }); }
         let bestN=Infinity; pr='tl';
@@ -3609,9 +3769,9 @@ function drawChart(){
       if(item.editable!==false) chartUI.legRows.push({key:item.key, x:boxX, y:rowY-rowH/2, w:boxW, h:rowH});
       if(item.kind==='point'){
         ctx.fillStyle=item.color;
-        ctx.beginPath(); ctx.arc(boxX+padX+markerW/2, rowY, Math.min(Math.max(sty.size,3),7)*sc, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(boxX+padX+markerW/2, rowY, Math.min(Math.max(item.key.endsWith('2')?sty.size2:sty.size,3),7)*sc, 0, Math.PI*2); ctx.fill();
       } else {
-        ctx.strokeStyle=item.color; ctx.lineWidth=Math.min(sty.lw,5)*Math.min(sc,2);
+        ctx.strokeStyle=item.color; ctx.lineWidth=Math.min(item.key.endsWith('2')?sty.lw2:sty.lw,5)*Math.min(sc,2);
         ctx.beginPath(); ctx.moveTo(boxX+padX, rowY); ctx.lineTo(boxX+padX+markerW, rowY); ctx.stroke();
       }
       const L=Ls[i], tx=boxX+padX+markerW+8;
@@ -3635,12 +3795,18 @@ function cpSaveCustom(){ try{ localStorage.setItem('labCustomColors', JSON.strin
 function cpBuild(wrap){
   const input=wrap.querySelector('input.cp-native'); if(!input || wrap._cp) return;
   const box=document.createElement('div'); box.className='cp-box';
-  box.innerHTML='<div class="cp-cur"><span class="cp-chip"></span><b class="cp-hex"></b></div><div class="cp-grid"></div><span class="cp-sep"></span><div class="cp-cust"></div><span class="cp-addwrap"><button type="button" class="cp-add" data-i="cpAddBtn"></button></span>';
+  box.innerHTML='<div class="cp-cur" tabindex="0" role="button"><span class="cp-chip"></span><b class="cp-hex"></b><span class="cp-car">▾</span></div><div class="cp-pop"><div class="cp-grid"></div><span class="cp-sep"></span><div class="cp-cust"></div><span class="cp-addwrap"><button type="button" class="cp-add" data-i="cpAddBtn"></button></span></div>';
+  const curEl=box.querySelector('.cp-cur');
+  const closePal=()=>document.querySelectorAll('.cp-box.open').forEach(b=>b.classList.remove('open'));
+  curEl.addEventListener('click',e=>{ e.stopPropagation(); const o=box.classList.contains('open'); closePal(); if(!o) box.classList.add('open'); });
+  curEl.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); curEl.click(); } });
+  box.addEventListener('click',e=>e.stopPropagation());
+  if(!window._cpDocBound){ window._cpDocBound=true; document.addEventListener('click',()=>document.querySelectorAll('.cp-box.open').forEach(b=>b.classList.remove('open'))); document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.cp-box.open').forEach(b=>b.classList.remove('open')); }); }
   wrap.appendChild(box);
   const chip=box.querySelector('.cp-chip'), hex=box.querySelector('.cp-hex'), grid=box.querySelector('.cp-grid'), cust=box.querySelector('.cp-cust'), sep=box.querySelector('.cp-sep'), add=box.querySelector('.cp-add');
   box.querySelector('.cp-addwrap').appendChild(input);                    // native oyna «Boşqa rang» tugmasi yonida açiladi
   const pick=c=>{ input.value=c; input.dispatchEvent(new Event('input',{bubbles:true})); input.dispatchEvent(new Event('change',{bubbles:true})); };
-  const mk=c=>{ const b=document.createElement('button'); b.type='button'; b.className='cp-sw'; b.style.background=c; b.dataset.c=c; b.title=c.toUpperCase(); b.setAttribute('aria-label',c); b.addEventListener('click',()=>pick(c)); return b; };
+  const mk=c=>{ const b=document.createElement('button'); b.type='button'; b.className='cp-sw'; b.style.background=c; b.dataset.c=c; b.title=c.toUpperCase(); b.setAttribute('aria-label',c); b.addEventListener('click',()=>{ pick(c); box.classList.remove('open'); }); return b; };
   function render(){
     grid.innerHTML=''; CP_BASIC.forEach(c=>grid.appendChild(mk(c)));
     cust.innerHTML=''; CP_CUSTOM.forEach(c=>cust.appendChild(mk(c)));
@@ -3662,8 +3828,8 @@ function cpBuild(wrap){
   });
   wrap._cp={render,sync}; render();
 }
-function syncPalettes(){ ['ptColor','fitColor','smoothColor'].forEach(id=>{ const el=CQ(id), w=el&&el.closest('.cp-wrap'); if(w&&w._cp) w._cp.sync(); }); }
-CHBIND.push(()=>{ ['ptColor','fitColor','smoothColor'].forEach(id=>{ const el=CQ(id), w=el&&el.closest('.cp-wrap'); if(w) cpBuild(w); }); });
+function syncPalettes(){ ['ptColor','fitColor','smoothColor','ptColor2','fitColor2','smoothColor2'].forEach(id=>{ const el=CQ(id), w=el&&el.closest('.cp-wrap'); if(w&&w._cp) w._cp.sync(); }); }
+CHBIND.push(()=>{ ['ptColor','fitColor','smoothColor','ptColor2','fitColor2','smoothColor2'].forEach(id=>{ const el=CQ(id), w=el&&el.closest('.cp-wrap'); if(w) cpBuild(w); }); });
 
 CHBIND.push(()=>CQ('btnSaveImg').addEventListener('click', async ()=>{
   const cv=CQ('fitCanvas');
@@ -3979,36 +4145,89 @@ function refreshLegendPlaceholders(fit){ /* endi legend yozuvlari grafikning öz
 // Nuqtalarni tutashtirish: shakl saqlovchi monoton kubik (PCHIP, x bo'yicha).
 // Egri chiziq HECH QACHON qo'shni nuqtalar qiymatidan oshib ketmaydi — «bortib olish» va soxta cho'qqilar yo'q.
 // Silliqlik darajasi > 0 bo'lsa, avval shovqin x bo'yicha 4-darajali lokal polinom bilan yumshatiladi (cho'qqilar balandligi saqlanadi, uchlari qimirlamaydi).
-function polySmooth(P, sigmaIdx, deg){
-  const n=P.length; if(n<4) return P.map(p=>p[1]);
-  const dxs=[]; for(let i=1;i<n;i++) dxs.push(P[i][0]-P[i-1][0]); dxs.sort((a,b)=>a-b);
-  const h=Math.max(dxs[Math.floor(dxs.length/2)],1e-12)*sigmaIdx;          // o'tkazish kengligi (x birligida)
-  const m=Math.min(n-1, Math.max(4, Math.ceil(3*sigmaIdx))+2);              // uchlarda toq aks ettiriladigan nuqtalar
-  const X=[],Y=[];
-  for(let k=m;k>=1;k--){ X.push(2*P[0][0]-P[k][0]); Y.push(2*P[0][1]-P[k][1]); }
-  for(let i=0;i<n;i++){ X.push(P[i][0]); Y.push(P[i][1]); }
-  for(let k=1;k<=m;k++){ X.push(2*P[n-1][0]-P[n-1-k][0]); Y.push(2*P[n-1][1]-P[n-1-k][1]); }
-  const N=X.length, D=deg+1, out=new Array(n), W=Math.ceil(4*sigmaIdx)+2;
-  for(let i=0;i<n;i++){
-    const c=i+m, xc=X[c];
-    const A=Array.from({length:D},()=>new Array(D+1).fill(0));
-    for(let j=Math.max(0,c-W); j<=Math.min(N-1,c+W); j++){
-      const u=(X[j]-xc)/h, w=Math.exp(-0.5*u*u); if(w<1e-9) continue;
-      const pw=[1]; for(let q=1;q<2*deg+1;q++) pw.push(pw[q-1]*u);
-      for(let r=0;r<D;r++){ for(let s=0;s<D;s++) A[r][s]+=w*pw[r+s]; A[r][D]+=w*pw[r]*Y[j]; }
+
+// Silliqlaş (kubik silliqlaş spline, Reinsch). Egri çiziq nuqtalardan CHEKLANGAN masofada qoladi:
+// «daraja» = ruxsat etilgan o'rtacha kvadratik og'ish (shovqin darajasining ulushi sifatida).
+// 0 → hamma nuqtadan aniq ötadi; daraja oşgan sari egri çiziq tekisroq bölada, lekin nuqtalardan
+// shovqin çegarasidan ortiq uzoqlaşmaydi (cho'qqilar yassilanib, çetlar «qaçib» ketmaydi).
+function noiseSigma(X, Y){
+  const n=X.length; if(n<3) return 0;
+  let s2=0, c=0;
+  if(n>=6){          // 3-tartibli bölingan ayirma: 2-darajagacha bölgan egrilikni «shovqin» deb hisoblamaydi
+    for(let i=0;i+3<n;i++){
+      let D=0, V=0, ok=true;
+      for(let j=0;j<4;j++){ let pr=1; for(let k=0;k<4;k++) if(k!==j) pr*=(X[i+j]-X[i+k]); if(!pr){ ok=false; break; } D+=Y[i+j]/pr; V+=1/(pr*pr); }
+      if(!ok || !(V>0)) continue; s2+=D*D/V; c++;
     }
-    let ok=true;
-    for(let r=0;r<D;r++){
-      let pv=r; for(let q=r+1;q<D;q++) if(Math.abs(A[q][r])>Math.abs(A[pv][r])) pv=q;
-      if(Math.abs(A[pv][r])<1e-12){ ok=false; break; }
-      const tmp=A[r]; A[r]=A[pv]; A[pv]=tmp;
-      for(let q=r+1;q<D;q++){ const f=A[q][r]/A[r][r]; for(let s=r;s<=D;s++) A[q][s]-=f*A[r][s]; }
+  } else {           // kam nuqta: qo'shnilar çizig'idan og'ish (Gasser–Sroka–Jennen-Steinmetz)
+    for(let i=1;i<n-1;i++){
+      const h1=X[i]-X[i-1], h2=X[i+1]-X[i], H=h1+h2; if(!(H>0)) continue;
+      const a=h2/H, b=h1/H, e=a*Y[i-1]+b*Y[i+1]-Y[i];
+      s2+=e*e/(1+a*a+b*b); c++;
     }
-    if(!ok){ out[i]=P[i][1]; continue; }
-    const co=new Array(D); for(let r=D-1;r>=0;r--){ let s=A[r][D]; for(let q=r+1;q<D;q++) s-=A[r][q]*co[q]; co[r]=s/A[r][r]; }
-    out[i]=co[0];
   }
-  return out;
+  return c? Math.sqrt(s2/c) : 0;
+}
+function bandSolve(A0,A1,A2,rhs){          // simmetrik 5-diagonalli sistema (LDLᵀ)
+  const m=rhs.length, d=new Array(m), l1=new Array(m).fill(0), l2=new Array(m).fill(0), z=new Array(m);
+  for(let i=0;i<m;i++){
+    let di=A0[i];
+    if(i>=1) di-=l1[i]*l1[i]*d[i-1];
+    if(i>=2) di-=l2[i]*l2[i]*d[i-2];
+    d[i]=di;
+    if(i+1<m){ let v=A1[i]; if(i>=1) v-=l1[i]*d[i-1]*l2[i+1]; l1[i+1]=v/di; }
+    if(i+2<m){ l2[i+2]=A2[i]/di; }
+  }
+  for(let i=0;i<m;i++){ let v=rhs[i]; if(i>=1) v-=l1[i]*z[i-1]; if(i>=2) v-=l2[i]*z[i-2]; z[i]=v; }
+  const g=new Array(m);
+  for(let i=m-1;i>=0;i--){ let v=z[i]/d[i]; if(i+1<m) v-=l1[i+1]*g[i+1]; if(i+2<m) v-=l2[i+2]*g[i+2]; g[i]=v; }
+  return g;
+}
+// X: o'suvçi, normallashgan; qaytaradi {f, g} — tugundagi qiymatlar va ikkinçi hosilalar (g[0]=g[n-1]=0)
+function smoothSplineFit(X,Y,lam){
+  const n=X.length, m=n-2, h=[]; for(let i=0;i<n-1;i++) h.push(X[i+1]-X[i]);
+  const a=[],b=[],c=[];                   // Q ning j-ustuni (j=1..n-2): qatorlar j-1, j, j+1
+  for(let j=1;j<=m;j++){ a.push(1/h[j-1]); b.push(-1/h[j-1]-1/h[j]); c.push(1/h[j]); }
+  const A0=new Array(m),A1=new Array(m).fill(0),A2=new Array(m).fill(0),rhs=new Array(m);
+  for(let k=0;k<m;k++){
+    const j=k+1;
+    A0[k]=(h[j-1]+h[j])/3 + lam*(a[k]*a[k]+b[k]*b[k]+c[k]*c[k]);
+    if(k+1<m) A1[k]=h[j]/6 + lam*(b[k]*a[k+1]+c[k]*b[k+1]);
+    if(k+2<m) A2[k]=lam*(c[k]*a[k+2]);
+    rhs[k]=a[k]*Y[j-1]+b[k]*Y[j]+c[k]*Y[j+1];
+  }
+  const gam=m>0?bandSolve(A0,A1,A2,rhs):[];
+  const f=Y.slice(); const g=new Array(n).fill(0);
+  for(let k=0;k<m;k++){ const j=k+1; g[j]=gam[k]; f[j-1]-=lam*a[k]*gam[k]; f[j]-=lam*b[k]*gam[k]; f[j+1]-=lam*c[k]*gam[k]; }
+  return {f,g};
+}
+function rmsRes(Y,f){ let s=0; for(let i=0;i<Y.length;i++){ const d=Y[i]-f[i]; s+=d*d; } return Math.sqrt(s/Y.length); }
+// daraja (1..10) → silliqlangan egri: {X,F,G} (F — tugundagi qiymat, G — ikkinçi hosila)
+function boundedSmooth(P, lv){
+  const n=P.length;
+  const x0=P[0][0], xr=(P[n-1][0]-x0)||1;
+  const X=P.map(p=>(p[0]-x0)/xr);
+  const ym=P.reduce((a,p)=>a+p[1],0)/n;
+  let ysd=Math.sqrt(P.reduce((a,p)=>a+(p[1]-ym)*(p[1]-ym),0)/n)||1;
+  const Y=P.map(p=>(p[1]-ym)/ysd);
+  const sig=noiseSigma(X,Y);
+  const target=sig*0.14*lv;                    // 10-daraja ≈ 1.4σ: shovqindan ortiq tekislanmaydi
+  if(!(target>1e-9)) return null;
+  const maxRes=rmsRes(Y, (()=>{                // eng tekis holat (töğri çiziq) og'ishi
+    const mx=X.reduce((a,b)=>a+b,0)/n; let sxx=0,sxy=0; for(let i=0;i<n;i++){ sxx+=(X[i]-mx)*(X[i]-mx); sxy+=(X[i]-mx)*Y[i]; }
+    const bb=sxx>0?sxy/sxx:0; return X.map(x=>bb*(x-mx)); })());
+  let lo=-14, hi=8, best=null;
+  if(target>=maxRes) best=smoothSplineFit(X,Y,Math.pow(10,hi));
+  else {
+    for(let it=0;it<48;it++){
+      const mid=(lo+hi)/2, r=smoothSplineFit(X,Y,Math.pow(10,mid)), e=rmsRes(Y,r.f);
+      if(e<target) lo=mid; else hi=mid; best=r;
+      if(Math.abs(e-target)<target*1e-3) break;
+    }
+  }
+  if(!best) return null;
+  // normallashni qaytarish: f = ym + ysd·f̃,  f'' = ysd/xr²·g̃
+  return {X:P.map(p=>p[0]), F:best.f.map(v=>ym+ysd*v), G:best.g.map(v=>ysd*v/(xr*xr))};
 }
 function smoothCurve(xs, ys, level){
   const idx=xs.map((_,i)=>i).sort((a,b)=>xs[a]-xs[b]); const P=[];
@@ -4016,7 +4235,22 @@ function smoothCurve(xs, ys, level){
   const n=P.length; if(n<2) return null;
   const lv=(level===undefined)?smoothLevel():level;
   const X=P.map(p=>p[0]); let Y=P.map(p=>p[1]);
-  if(lv>0 && n>=4) Y=polySmooth(P, 0.6+0.35*lv, n>=20?4:2);   // kam nuqtada 2-daraja (4-daraja ortiqcha tebranadi)
+  // 1) silliqlaş > 0 bölsa: og'ishi cheklangan kubik spline (nuqtalardan uzoqlaşmaydi)
+  if(lv>0 && n>=4){
+    const R=boundedSmooth(P,lv);
+    if(R){
+      const pts=[], S=24;
+      for(let i=0;i<n-1;i++){
+        const h=R.X[i+1]-R.X[i];
+        for(let k=0;k<(i===n-2?S+1:S);k++){
+          const t=k/S, v=(1-t)*R.F[i]+t*R.F[i+1]-h*h/6*t*(1-t)*((2-t)*R.G[i]+(1+t)*R.G[i+1]);
+          pts.push([R.X[i]+t*h, v]);
+        }
+      }
+      return pts;
+    }
+  }
+  // 2) 0-daraja (yoki shovqin yo'q): shakl saqlovçi PCHIP — hamma nuqtadan aniq ötadi
   // PCHIP (Fritsch–Carlson) hosilalari
   const h=[], d=[]; for(let i=0;i<n-1;i++){ h.push(X[i+1]-X[i]); d.push((Y[i+1]-Y[i])/h[i]); }
   const m=new Array(n).fill(0);
@@ -4148,9 +4382,11 @@ function drawOverlay(){
   if(sty.pts && lastFit.ptPos) lastFit.ptPos.forEach(([px,py,i])=>{
     if(selSet ? !selSet.has(i) : (i%sty.every!==0)) return;
     const d=((px-lx)*k)**2+((py-ly)*k)**2; if(d<bd){ bd=d; snap=i; } });
-  let X, Y, exSnap=null;
+  let X, Y, exSnap=null, snap2=-1; const S2h=activeS2();
   if(sty.pts && lastFit.extraPts) lastFit.extraPts.forEach(q=>{ const d=((gx(q.x)-lx)*k)**2+((gy(q.y)-ly)*k)**2; if(d<bd){ bd=d; exSnap=q; } });
-  if(exSnap){ X=exSnap.x; Y=exSnap.y; }
+  if(sty.pts && S2h && lastFit.ptPos2) lastFit.ptPos2.forEach(([px,py,i])=>{ const d=((px-lx)*k)**2+((py-ly)*k)**2; if(d<bd){ bd=d; snap2=i; exSnap=null; snap=-1; } });
+  if(snap2>=0){ X=S2h.xs[snap2]; Y=S2h.ys[snap2]; }
+  else if(exSnap){ X=exSnap.x; Y=exSnap.y; }
   else if(snap>=0){ X=lastFit.xs[snap]; Y=lastFit.ys[snap]; }
   else { const cvv=getCurve(); X=xc; Y=cvv?cvv.fn(xc):NaN; if(!isFinite(Y)) Y=yc; }
   const px=gx(X)*k, py=gy(Y)*k, axY=(g.H-g.padB)*k, axX=g.padL*k;
@@ -4158,7 +4394,7 @@ function drawOverlay(){
   ctx.save(); ctx.setLineDash([5,4]); ctx.strokeStyle='rgba(217,119,6,.85)'; ctx.lineWidth=1.2;
   ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px,axY); ctx.moveTo(px,py); ctx.lineTo(axX,py); ctx.stroke(); ctx.restore();
   ctx.fillStyle='#f59e0b'; ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill(); ctx.stroke();
-  const cxo=findCol(lastFit.xid), cyo=findCol(lastFit.yid);
+  const cxo=findCol(snap2>=0?S2h.xid:lastFit.xid), cyo=findCol(snap2>=0?S2h.yid:lastFit.yid);
   const nx=cxo?latexToGreek(cxo.header):'X', ny=cyo?latexToGreek(cyo.header):'Y';
   const L=layoutMultiline(ctx, nx+' = '+fmt(X,4)+'\n'+ny+' = '+fmt(Y,4), 13, 'all');
   const pd=7, bw=L.w+pd*2, bh=L.a+L.d+pd*2;
@@ -4192,6 +4428,7 @@ function syncExtraUI(){
   const sw=CQ('swSmooth'), lr=CQ('smoothLvlRow'); if(sw&&lr) lr.style.display=sw.checked?'':'none';
   const pw=CQ('swPoints'), pt=CQ('ptTools'); if(pw&&pt) pt.style.display=pw.checked?'':'none';
   updPtCount();
+  try{ syncSeries2UI(); }catch(e){}
 }
 function applyChartSize(){
   const st=CQ('chartStage'), w=parseFloat(CQ('chW').value); if(!st) return;
@@ -4450,6 +4687,14 @@ function autoAxisRaw(c, fallback, n){
   const tail = [n ? '10^'+n : '', u].filter(Boolean).join(' ');
   return tail ? name+', '+tail : name;
 }
+function autoAxisRawFor(isX, n){
+  if(!lastFit) return '';
+  const id1=isX?lastFit.xid:lastFit.yid;
+  let raw=autoAxisRaw(findCol(id1), isX?lastFit.xLabel:lastFit.yLabel, n);
+  const S2=activeS2();
+  if(S2){ const id2=isX?S2.xid:S2.yid; if(id2!==id1) raw+='; '+autoAxisRaw(findCol(id2), isX?S2.xLabel:S2.yLabel, n); }
+  return raw;
+}
 function axisExpFor(ov, auto){
   if(ov===null || ov===undefined) return auto;
   const m=/10\s*\^\s*\(?\s*([-\u2212+]?\d+)\s*\)?/.exec(String(ov));
@@ -4493,7 +4738,7 @@ function openChartEditor(kind, row){
     const isX=kind==='x';
     region=chartUI.regions[kind]; if(!region) return;
     const c=isX?cxo:cyo, fb=isX?lastFit.xLabel:lastFit.yLabel, key=isX?'xOv':'yOv';
-    const auto=autoAxisRaw(c, fb, isX?chartUI.xExpAuto:chartUI.yExpAuto);
+    const auto=autoAxisRawFor(isX, isX?chartUI.xExpAuto:chartUI.yExpAuto);
     initial = chartUI[key]!=null ? chartUI[key] : auto;
     fontPx=13; bold=true; rotate=!isX;
     commit=v=>{ const nv=v.trim(); chartUI[key]=(nv==='' || nv===auto) ? null : nv; };
@@ -4867,6 +5112,7 @@ uz:{
   <h4>Qöşimça sozlamalar</h4>
   <ul>
    <li><b>Nuqtalarni silliq çiziq bilan tutaştiriş</b> — nuqtalar orasidan silliq çiziq çizadi (Best Fit'dan mustaqil).</li>
+   <li><b>Shu grafikka ikkinçi boğlaniş qöşiş</b> — bitta grafikda ikkita boğlanişni (X₂–Y₂) çizadi; ikkalasining rangi va ölçami «Grafik körinişi» bölimida «1-boğlaniş / 2-boğlaniş» tanlaş orqali sozlanadi.</li>
    <li><b>Legendni körsatiş</b> — legendni yoqadi/öçiradi.</li>
   </ul>`},
  {id:'g-edit', title:"7. Grafikdagi yozuvlarni tahrirlaş", html:`
@@ -5163,6 +5409,7 @@ en:{
   <h4>Extra options</h4>
   <ul>
    <li><b>Connect points with a smooth line</b> — draws a smooth line through the points (independent of Best Fit).</li>
+   <li><b>Add a second relation to this chart</b> — draws two relations (X₂–Y₂) on one chart; colors and sizes of both are set in “Chart look” by choosing “1st / 2nd relation”.</li>
    <li><b>Show legend</b> — turns the legend on or off.</li>
   </ul>`},
  {id:'g-edit', title:"7. Editing text on the chart", html:`
